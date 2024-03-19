@@ -16,6 +16,22 @@ report$.addEventListener('click', () => {
 	socket.emit('report');
 });
 
+comms$.addEventListener('click', () => {
+	comms$.style.display = 'none';
+	tasks$.style.display = 'none';
+	progressBar$.style.display = 'none';
+	emergencyMeeting$.style.display = 'none';
+	playSound(SOUNDS.comms);
+	setTimeout(function() {
+			tasks$.style.display = 'inline'; // Use 'block' instead of 'compact'
+			progressBar$.style.display = 'inline'; // Use 'block' instead of 'compact'
+			emergencyMeeting$.style.display = 'inline'; // Use 'block' instead of 'compact'
+	}, 26000);
+
+	setTimeout(function() {
+		comms$.style.display = 'inline';}, 
+	26000);
+});
 
 
 emergencyMeeting$.addEventListener('click', () => {
@@ -97,7 +113,8 @@ const SOUNDS = {
 	sussyBoy: '/sounds/sussy-boy.mp3',
 	voteResult: '/sounds/vote-result.mp3',
 	youLose: '/sounds/you-lose.mp3',
-	youWin: '/sounds/you-win.mp3'
+	youWin: '/sounds/you-win.mp3',
+	comms: '/sounds/comms.mp3'
 };
 
 socket.on('play-meeting', async () => {
@@ -110,6 +127,10 @@ socket.on('play-win', async () => {
 	await playSound(SOUNDS.youWin);
 });
 
+socket.on('comms', async () => {
+	await playSound(SOUNDS.comms);
+});
+
 enableSound$.addEventListener('click', async () => {
 	console.log('enable sound');
 	enableSound$.style.display = 'none';
@@ -120,19 +141,4 @@ async function playSound(url) {
 	soundPlayer.src = url;
 	await soundPlayer.play();
 }
-comms$.addEventListener('click', () => {
-	socket.emit('comms');
-	comms$.style.display = 'none';
-	tasks$.style.display = 'none';
-	progressBar$.style.display = 'none';
-	emergencyMeeting$.style.display = 'none';
-
-	// FIX THIS
-	setInterval(function() {
-		comms$.style.display = 'inline';
-		tasks$.style.display = 'compact';
-		progressBar$.style.display = 'compact'
-		emergencyMeeting$.style.display = 'compact';
-	}, 5000);
-});
 

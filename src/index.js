@@ -122,6 +122,10 @@ io.on('connection', socket => {
 		io.emit('play-meeting');
 	});
 
+	socket.on('comms', () => {
+		io.emit('comms');
+	});
+
 	socket.on('task-complete', taskId => {
 		if (typeof taskProgress[taskId] === 'boolean') {
 			taskProgress[taskId] = true;
