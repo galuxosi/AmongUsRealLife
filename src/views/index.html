@@ -26,12 +26,16 @@
 			<img src="/images/comms-sabotage.webp" />
 		</button>
 
-		<p>Виконано <span id="progress">0</span>% завданнь</p>
+		<button id="oxygen">
+			<img src="/images/oxygen-depleted.webp" />
+		</button>
+
+		<p>Виконано <span id="progress">0</span>% завданнь</p>	
 		<div class="progress">
 			<div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%"></div>
 		</div>
 
-		<h2>Завдання</h2>
+		<h2 id="tasksLabel">Завдання</h2>
 		<ol id="tasks"></ol>
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js" integrity="sha512-eVL5Lb9al9FzgR63gDs1MxcDS2wFu3loYAgjIH0+Hg38tCS8Ag62dwKyH+wzDb+QauDpEZjXbMn11blw8cbTJQ==" crossorigin="anonymous"></script>

@@ -72,5 +72,24 @@ socket.on('play-comms', async () => {
     return new Promise(resolve => {
       setTimeout(() => resolve(), milliseconds);
     });
-  }
-})();
+  };
+socket.on('do-comms', async () => {
+	comms$.style.display = 'none'
+	tasks$.style.display = 'none'
+	progressBar$.style.display = 'none'
+	emergencyMeeting$.style.display = 'none'
+	playSound(SOUNDS.comms);
+	document.getElementById("tasksLabel").style.color = "#8B0000";
+	document.getElementById("tasksLabel").innerHTML = "Саботаж зв'язку";
+	setTimeout(function() {
+		comms$.style.display = 'inline'
+	}, 60000);
+	setTimeout(function(){
+		tasks$.style.display = 'inline'
+		progressBar$.style.display = 'block'
+		emergencyMeeting$.style.display = 'inline'
+		document.getElementById("tasksLabel").style.color = "#000000";
+		document.getElementById("tasksLabel").innerHTML = "Завдання";
+	}, 26000);
+});
+

@@ -1,26 +1,24 @@
-# Among Us in real life
+# Among Us в реальному житті
 
-I hacked together this small little web app for facilitating a game of Among Us in real life.
+Це форк репозиторію [among-us-real-life](https://github.com/michaelgira23/among-us-real-life). Я доробив його для гри зі своїми друзями, але ви можете використовувати для особистого використаня.
+## Можливості
 
-## Features
+-   Призначаня предателів/членів екіпажу
+-   Призначання завдань
+-   Глобальний прогрес завдань який заповнюється при їх виконанні.
+-   Саботаж комунікації (тимчасово вимикає екстренну кнопку, приховує завдання і прогресс завдань)
 
--   Assign impostors/crewmates
--   Assign tasks
--   Checking off tasks updates a global progress bar in real-time
+## Скріншот
 
-Audio recordings from [https://www.voicy.network/pages/among-us](https://www.voicy.network/pages/among-us)
+<img src="src/public/images/screen.jpg" width="50%" />
 
-## Screenshot
+## Використаня
 
-<img src="media/IMG_0976.PNG" width="50%" />
-
-## Usage
-
-This was built for personal use, but anyone is welcome to use this for hosting their own game.
+Цей сайт був створений для особистого використання, але ви також маєте можливість використовувати це для хостингу своєї гри.
 
 ### 1. Configure the game
 
-You may want to modify the following properties located in [`src/index.js`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js):
+Ви можете змінити значення у [`src/index.js`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js):
 
 [`TASKS`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js#L14) - An array of strings that consist of all possible tasks. These will be randomly assigned to players.
 
@@ -51,5 +49,5 @@ Players may access the the game at [http://localhost:4046](http://localhost:4046
 
 ## Known issues
 
--   Sometimes, duplicate tasks are assigned (temporary workaround is to start another game)
--   On some Android phones, hiding the browser will reset its state, therefore losing your tasks
+-   Деколи, гравцям назначаються одинакові завдання (помагає перезапуск гри)
+-   На деяких Android телефонах, закриття браузера приводить до відключення від гри. Помагає зняття обмеження використання акумулятора браузером.
