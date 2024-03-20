@@ -11,9 +11,13 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+const min = 10000;
+const max = 99999;
+const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+
 const TASKS = [
 	'Адмін: Проведіть карту',
-	'Адмін: Введіть ID-код',
+	'Адмін: Введіть ID-код: ' + randomNumber,
 	'Адмін: Завантажте дані',
 	'Комунікації: Перезавантажте WiFi',
 	'Турніки: Повесіть на турніку 10 с',
@@ -123,7 +127,7 @@ io.on('connection', socket => {
 	});
 
 	socket.on('comms', () => {
-		io.emit('comms');
+		io.emit('do-comms');
 	});
 
 	socket.on('task-complete', taskId => {
@@ -137,9 +141,10 @@ io.on('connection', socket => {
 		if (typeof taskProgress[taskId] === 'boolean') {
 			taskProgress[taskId] = false;
 		}
+
 		emitTaskProgress();
-	});
-});
+
+})});
 
 function emitTaskProgress() {
 	const tasks = Object.values(taskProgress);
@@ -153,3 +158,8 @@ function emitTaskProgress() {
 }
 
 server.listen(PORT, () => console.log(`Server listening on *:${PORT}`));
+
+// Initialize a cooldown object
+const commsCooldown = {};
+
+// Modify the 'comms' event handler

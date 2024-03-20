@@ -12,32 +12,43 @@ const report$ = document.querySelector('#report');
 const tasks$ = document.querySelector('#tasks');
 const comms$ = document.querySelector('#comms');
 
+const soundPlayer = new Audio();
+const SOUNDS = {
+	meeting: '/sounds/meeting.mp3',
+	sabotage: '/sounds/sabotage.mp3',
+	start: '/sounds/start.mp3',
+	sussyBoy: '/sounds/sussy-boy.mp3',
+	voteResult: '/sounds/vote-result.mp3',
+	youLose: '/sounds/you-lose.mp3',
+	youWin: '/sounds/you-win.mp3',
+	comms: '/sounds/comms.mp3'
+};
+
 report$.addEventListener('click', () => {
 	socket.emit('report');
 });
-
-comms$.addEventListener('click', () => {
-	comms$.style.display = 'none';
-	tasks$.style.display = 'none';
-	progressBar$.style.display = 'none';
-	emergencyMeeting$.style.display = 'none';
-	playSound(SOUNDS.comms);
-	setTimeout(function() {
-			tasks$.style.display = 'inline'; // Use 'block' instead of 'compact'
-			progressBar$.style.display = 'inline'; // Use 'block' instead of 'compact'
-			emergencyMeeting$.style.display = 'inline'; // Use 'block' instead of 'compact'
-	}, 26000);
-
-	setTimeout(function() {
-		comms$.style.display = 'inline';}, 
-	26000);
-});
-
 
 emergencyMeeting$.addEventListener('click', () => {
 	socket.emit('emergency-meeting');
 	emergencyMeeting$.style.display = 'none';
 });
+
+comms$.addEventListener('click', () => {
+	socket.emit('comms')
+	comms$.style.display = 'none'
+	tasks$.style.display = 'none'
+	progressBar$.style.display = 'none'
+	emergencyMeeting$.style.display = 'none'
+	playSound(SOUNDS.comms);
+	setTimeout(function() {
+		comms$.style.display = 'inline'
+	}, 60000);
+	setTimeout(function(){
+		tasks$.style.display = 'inline'
+		progressBar$.style.display = 'block'
+		emergencyMeeting$.style.display = 'inline'
+	}, 26000);
+})
 
 socket.on('tasks', tasks => {
 	// Remove existing tasks
@@ -98,24 +109,11 @@ socket.on('progress', progress => {
  * Sounds
  */
 
-
 async function wait(milliseconds) {
 	await new Promise(resolve => {
 		setTimeout(() => resolve(), milliseconds);
 	});
 }
-
-const soundPlayer = new Audio();
-const SOUNDS = {
-	meeting: '/sounds/meeting.mp3',
-	sabotage: '/sounds/sabotage.mp3',
-	start: '/sounds/start.mp3',
-	sussyBoy: '/sounds/sussy-boy.mp3',
-	voteResult: '/sounds/vote-result.mp3',
-	youLose: '/sounds/you-lose.mp3',
-	youWin: '/sounds/you-win.mp3',
-	comms: '/sounds/comms.mp3'
-};
 
 socket.on('play-meeting', async () => {
 	await playSound(SOUNDS.meeting);
@@ -127,8 +125,24 @@ socket.on('play-win', async () => {
 	await playSound(SOUNDS.youWin);
 });
 
-socket.on('comms', async () => {
-	await playSound(SOUNDS.comms);
+socket.on('do-comms', async () => {
+	comms$.style.display = 'none'
+	tasks$.style.display = 'none'
+	progressBar$.style.display = 'none'
+	emergencyMeeting$.style.display = 'none'
+	document.getElementById("tasksLabel").innerHTML = "Саботаж зв`язку";
+	document.getElementById("tasksLabel").style.color = "#ff0000";
+	playSound(SOUNDS.comms);
+	setTimeout(function() {
+		comms$.style.display = 'inline'
+	}, 60000);
+	setTimeout(function(){
+		document.getElementById("tasksLabel").innerHTML = "Завдання";
+		document.getElementById("tasksLabel").style.color = "#000000";
+		tasks$.style.display = 'inline'
+		progressBar$.style.display = 'block'
+		emergencyMeeting$.style.display = 'inline'
+	}, 26000);
 });
 
 enableSound$.addEventListener('click', async () => {
