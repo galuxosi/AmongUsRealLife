@@ -1,5 +1,5 @@
 h1 {
-	font-family: 'Comic Sans MS';
+	font-family: Arial, Helvetica, sans-serif
 }
 
 button {
@@ -14,4 +14,20 @@ img {
 
 #enable-sound {
 	display: block;
+}
+
+.blink {
+  animation: blink-animation 1s infinite;
+}
+
+@keyframes blink-animation {
+  0% {
+    color: yellow;
+  }
+  50% {
+    color: red;
+  }
+  100% {
+    color: yellow;
+  }
 }
