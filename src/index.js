@@ -11,9 +11,13 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+const min = 10000;
+const max = 99999;
+const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+
 const TASKS = [
 	'Адмін: Проведіть карту',
-	'Адмін: Введіть ID-код',
+	'Адмін: Введіть ID-код: ' + randomNumber,
 	'Адмін: Завантажте дані',
 	'Комунікації: Перезавантажте WiFi',
 	'Турніки: Повесіть на турніку 10 с',
@@ -156,7 +160,7 @@ io.on('connection', socket => {
 			}, 26000);
 		}
 		});
-		
+
 		emitTaskProgress();
 
 	socket.on('comms', () => {
