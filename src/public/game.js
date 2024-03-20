@@ -16,8 +16,6 @@ report$.addEventListener('click', () => {
 	socket.emit('report');
 });
 
-
-
 emergencyMeeting$.addEventListener('click', () => {
 	socket.emit('emergency-meeting');
 	emergencyMeeting$.style.display = 'none';
@@ -120,19 +118,4 @@ async function playSound(url) {
 	soundPlayer.src = url;
 	await soundPlayer.play();
 }
-comms$.addEventListener('click', () => {
-	socket.emit('comms');
-	comms$.style.display = 'none';
-	tasks$.style.display = 'none';
-	progressBar$.style.display = 'none';
-	emergencyMeeting$.style.display = 'none';
-
-	// FIX THIS
-	setInterval(function() {
-		comms$.style.display = 'inline';
-		tasks$.style.display = 'compact';
-		progressBar$.style.display = 'compact'
-		emergencyMeeting$.style.display = 'compact';
-	}, 5000);
-});
 
