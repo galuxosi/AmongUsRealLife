@@ -1,22 +1,20 @@
-# Among Us in real life
+# Among Us в реальному житті
 
-I hacked together this small little web app for facilitating a game of Among Us in real life.
+Це форк репозиторію [among-us-real-life](https://github.com/michaelgira23/among-us-real-life). Я доробив його для гри зі своїми друзями, але ви можете використовувати для особистого використаня.
+## Можливості
 
-## Features
+-   Призначаня предателів/членів екіпажу
+-   Призначання завдань
+-   Глобальний прогрес завдань який заповнюється при їх виконанні.
+-   Саботаж комунікації (тимчасово вимикає екстренну кнопку, приховує завдання і прогресс завдань)
 
--   Assign impostors/crewmates
--   Assign tasks
--   Checking off tasks updates a global progress bar in real-time
+## Скріншот
 
-Audio recordings from [https://www.voicy.network/pages/among-us](https://www.voicy.network/pages/among-us)
+<img src="src/public/images/screen.jpg" width="50%" />
 
-## Screenshot
+## Використаня
 
-<img src="media/IMG_0976.PNG" width="50%" />
-
-## Usage
-
-This was built for personal use, but anyone is welcome to use this for hosting their own game.
+Це було бля мені лень
 
 ### 1. Configure the game
 
