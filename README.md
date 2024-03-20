@@ -14,11 +14,11 @@
 
 ## Використаня
 
-Це було бля мені лень
+Цей сайт був створений для особистого використання, але ви також маєте можливість використовувати це для хостингу своєї гри.
 
 ### 1. Configure the game
 
-You may want to modify the following properties located in [`src/index.js`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js):
+Ви можете змінити значення у [`src/index.js`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js):
 
 [`TASKS`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js#L14) - An array of strings that consist of all possible tasks. These will be randomly assigned to players.
 
@@ -49,5 +49,5 @@ Players may access the the game at [http://localhost:4046](http://localhost:4046
 
 ## Known issues
 
--   Sometimes, duplicate tasks are assigned (temporary workaround is to start another game)
--   On some Android phones, hiding the browser will reset its state, therefore losing your tasks
+-   Деколи, гравцям назначаються одинакові завдання (помагає перезапуск гри)
+-   На деяких Android телефонах, закриття браузера приводить до відключення від гри. Помагає зняття обмеження використання акумулятора браузером.
