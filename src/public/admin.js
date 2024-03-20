@@ -27,7 +27,8 @@ const SOUNDS = {
 	sussyBoy: new Audio('/sounds/sussy-boy.mp3'),
 	voteResult: new Audio('/sounds/vote-result.mp3'),
 	youLose: new Audio('/sounds/you-lose.mp3'),
-	youWin: new Audio('/sounds/you-win.mp3')
+	youWin: new Audio('/sounds/you-win.mp3'),
+	comms: new Audio('/sounds/comms.mp3')
 };
 
 socket.on('play-meeting', async () => {
@@ -38,4 +39,20 @@ socket.on('play-meeting', async () => {
 
 socket.on('play-win', async () => {
 	await SOUNDS.youWin.play();
+});
+
+socket.on('do-comms', async () => {
+	comms$.style.display = 'none'
+	tasks$.style.display = 'none'
+	progressBar$.style.display = 'none'
+	emergencyMeeting$.style.display = 'none'
+	playSound(SOUNDS.comms);
+	setTimeout(function() {
+		comms$.style.display = 'inline'
+	}, 60000);
+	setTimeout(function(){
+		tasks$.style.display = 'inline'
+		progressBar$.style.display = 'block'
+		emergencyMeeting$.style.display = 'inline'
+	}, 26000);
 });

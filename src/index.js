@@ -122,6 +122,10 @@ io.on('connection', socket => {
 		io.emit('play-meeting');
 	});
 
+	socket.on('comms', () => {
+		io.emit('do-comms');
+	});
+
 	socket.on('task-complete', taskId => {
 		if (typeof taskProgress[taskId] === 'boolean') {
 			taskProgress[taskId] = true;
@@ -133,9 +137,10 @@ io.on('connection', socket => {
 		if (typeof taskProgress[taskId] === 'boolean') {
 			taskProgress[taskId] = false;
 		}
+
 		emitTaskProgress();
-	});
-});
+
+})});
 
 function emitTaskProgress() {
 	const tasks = Object.values(taskProgress);
@@ -149,3 +154,26 @@ function emitTaskProgress() {
 }
 
 server.listen(PORT, () => console.log(`Server listening on *:${PORT}`));
+
+// Initialize a cooldown object
+const commsCooldown = {};
+
+// Modify the 'comms' event handler
+socket.on('comms', () => {
+  const socketId = socket.id;
+
+  // Check if the cooldown period has passed
+  if (!commsCooldown[socketId] || Date.now() - commsCooldown[socketId] >= 60000) {
+    // If the cooldown period has passed, emit the 'do-comms' event
+    io.emit('do-comms');
+
+    // Set the cooldown for this socket to the current time
+    commsCooldown[socketId] = Date.now();
+
+    // Disable other buttons for 26 seconds
+    setTimeout(() => {
+      socket.emit('enable-buttons');
+      delete commsCooldown[socketId];
+    }, 26000);
+  }
+});

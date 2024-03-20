@@ -12,16 +12,43 @@ const report$ = document.querySelector('#report');
 const tasks$ = document.querySelector('#tasks');
 const comms$ = document.querySelector('#comms');
 
+const soundPlayer = new Audio();
+const SOUNDS = {
+	meeting: '/sounds/meeting.mp3',
+	sabotage: '/sounds/sabotage.mp3',
+	start: '/sounds/start.mp3',
+	sussyBoy: '/sounds/sussy-boy.mp3',
+	voteResult: '/sounds/vote-result.mp3',
+	youLose: '/sounds/you-lose.mp3',
+	youWin: '/sounds/you-win.mp3',
+	comms: '/sounds/comms.mp3'
+};
+
 report$.addEventListener('click', () => {
 	socket.emit('report');
 });
-
-
 
 emergencyMeeting$.addEventListener('click', () => {
 	socket.emit('emergency-meeting');
 	emergencyMeeting$.style.display = 'none';
 });
+
+comms$.addEventListener('click', () => {
+	socket.emit('comms')
+	comms$.style.display = 'none'
+	tasks$.style.display = 'none'
+	progressBar$.style.display = 'none'
+	emergencyMeeting$.style.display = 'none'
+	playSound(SOUNDS.comms);
+	setTimeout(function() {
+		comms$.style.display = 'inline'
+	}, 60000);
+	setTimeout(function(){
+		tasks$.style.display = 'inline'
+		progressBar$.style.display = 'block'
+		emergencyMeeting$.style.display = 'inline'
+	}, 26000);
+})
 
 socket.on('tasks', tasks => {
 	// Remove existing tasks
@@ -82,23 +109,11 @@ socket.on('progress', progress => {
  * Sounds
  */
 
-
 async function wait(milliseconds) {
 	await new Promise(resolve => {
 		setTimeout(() => resolve(), milliseconds);
 	});
 }
-
-const soundPlayer = new Audio();
-const SOUNDS = {
-	meeting: '/sounds/meeting.mp3',
-	sabotage: '/sounds/sabotage.mp3',
-	start: '/sounds/start.mp3',
-	sussyBoy: '/sounds/sussy-boy.mp3',
-	voteResult: '/sounds/vote-result.mp3',
-	youLose: '/sounds/you-lose.mp3',
-	youWin: '/sounds/you-win.mp3'
-};
 
 socket.on('play-meeting', async () => {
 	await playSound(SOUNDS.meeting);
@@ -110,6 +125,22 @@ socket.on('play-win', async () => {
 	await playSound(SOUNDS.youWin);
 });
 
+socket.on('do-comms', async () => {
+	comms$.style.display = 'none'
+	setTimeout(function() {
+	comms$.style.display = 'inline'
+	}, 60000);
+
+	tasks$.style.display = 'none'
+	progressBar$.style.display = 'none'
+	emergencyMeeting$.style.display = 'none'
+	setTimeout(function(){
+	tasks$.style.display = 'inline'
+	progressBar$.style.display = 'block'
+	emergencyMeeting$.style.display = 'inline'
+	}, 26000);
+});	
+
 enableSound$.addEventListener('click', async () => {
 	console.log('enable sound');
 	enableSound$.style.display = 'none';
@@ -120,19 +151,4 @@ async function playSound(url) {
 	soundPlayer.src = url;
 	await soundPlayer.play();
 }
-comms$.addEventListener('click', () => {
-	socket.emit('comms');
-	comms$.style.display = 'none';
-	tasks$.style.display = 'none';
-	progressBar$.style.display = 'none';
-	emergencyMeeting$.style.display = 'none';
-
-	// FIX THIS
-	setInterval(function() {
-		comms$.style.display = 'inline';
-		tasks$.style.display = 'compact';
-		progressBar$.style.display = 'compact'
-		emergencyMeeting$.style.display = 'compact';
-	}, 5000);
-});
 
