@@ -47,6 +47,8 @@ socket.on('do-comms', async () => {
 	progressBar$.style.display = 'none'
 	emergencyMeeting$.style.display = 'none'
 	playSound(SOUNDS.comms);
+	document.getElementById("tasksLabel").style.color = "#8B0000";
+	document.getElementById("tasksLabel").innerHTML = "Саботаж зв'язку";
 	setTimeout(function() {
 		comms$.style.display = 'inline'
 	}, 60000);
@@ -54,5 +56,7 @@ socket.on('do-comms', async () => {
 		tasks$.style.display = 'inline'
 		progressBar$.style.display = 'block'
 		emergencyMeeting$.style.display = 'inline'
+		document.getElementById("tasksLabel").style.color = "#000000";
+		document.getElementById("tasksLabel").innerHTML = "Завдання";
 	}, 26000);
 });

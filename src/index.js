@@ -138,7 +138,45 @@ io.on('connection', socket => {
 			taskProgress[taskId] = false;
 		}
 
+	socket.on('comms', () => {
+		const socketId = socket.id;
+		
+		// Check if the cooldown period has passed
+		if (!commsCooldown[socketId] || Date.now() - commsCooldown[socketId] >= 60000) {
+			// If the cooldown period has passed, emit the 'do-comms' event
+			io.emit('do-comms');
+		
+			// Set the cooldown for this socket to the current time
+			commsCooldown[socketId] = Date.now();
+		
+			// Disable other buttons for 26 seconds
+			setTimeout(() => {
+			socket.emit('enable-buttons');
+			delete commsCooldown[socketId];
+			}, 26000);
+		}
+		});
+		
 		emitTaskProgress();
+
+	socket.on('comms', () => {
+  const socketId = socket.id;
+
+  // Check if the cooldown period has passed
+  if (!commsCooldown[socketId] || Date.now() - commsCooldown[socketId] >= 60000) {
+    // If the cooldown period has passed, emit the 'do-comms' event
+    io.emit('do-comms');
+
+    // Set the cooldown for this socket to the current time
+    commsCooldown[socketId] = Date.now();
+
+    // Disable other buttons for 26 seconds
+    setTimeout(() => {
+      socket.emit('enable-buttons');
+      delete commsCooldown[socketId];
+    }, 26000);
+  }
+});
 
 })});
 
@@ -159,21 +197,3 @@ server.listen(PORT, () => console.log(`Server listening on *:${PORT}`));
 const commsCooldown = {};
 
 // Modify the 'comms' event handler
-socket.on('comms', () => {
-  const socketId = socket.id;
-
-  // Check if the cooldown period has passed
-  if (!commsCooldown[socketId] || Date.now() - commsCooldown[socketId] >= 60000) {
-    // If the cooldown period has passed, emit the 'do-comms' event
-    io.emit('do-comms');
-
-    // Set the cooldown for this socket to the current time
-    commsCooldown[socketId] = Date.now();
-
-    // Disable other buttons for 26 seconds
-    setTimeout(() => {
-      socket.emit('enable-buttons');
-      delete commsCooldown[socketId];
-    }, 26000);
-  }
-});
