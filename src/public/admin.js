@@ -58,5 +58,5 @@ socket.on('do-comms', async () => {
 		tasks$.style.display = 'inline'
 		progressBar$.style.display = 'block'
 		emergencyMeeting$.style.display = 'inline'
-	}, 25000);
+	}, 26000);
 });

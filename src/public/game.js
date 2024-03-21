@@ -11,7 +11,6 @@ const progressBar$ = document.querySelector('.progress-bar');
 const report$ = document.querySelector('#report');
 const tasks$ = document.querySelector('#tasks');
 const comms$ = document.querySelector('#comms');
-const taskLabel$ = document.getElementById("tasksLabel");
 
 const soundPlayer = new Audio();
 const SOUNDS = {
@@ -48,7 +47,7 @@ comms$.addEventListener('click', () => {
 		tasks$.style.display = 'inline'
 		progressBar$.style.display = 'block'
 		emergencyMeeting$.style.display = 'inline'
-	}, 25000);
+	}, 26000);
 })
 
 socket.on('tasks', tasks => {
@@ -131,23 +130,20 @@ socket.on('do-comms', async () => {
 	tasks$.style.display = 'none'
 	progressBar$.style.display = 'none'
 	emergencyMeeting$.style.display = 'none'
-	progress$.style.display = 'none'
 	document.getElementById("tasksLabel").innerHTML = "Саботаж зв`язку";
-	document.getElementById("tasksLabel").classList.add('blink'); // Додати клас з анімацією
+	document.getElementById("tasksLabel").style.color = "#ff0000";
 	playSound(SOUNDS.comms);
 	setTimeout(function() {
-	  comms$.style.display = 'inline'
+		comms$.style.display = 'inline'
 	}, 60000);
 	setTimeout(function(){
-		document.getElementById("tasksLabel").innerHTML.classList.remove('blink'); // Зняти клас з анімацією
 		document.getElementById("tasksLabel").innerHTML = "Завдання";
 		document.getElementById("tasksLabel").style.color = "#000000";
 		tasks$.style.display = 'inline'
 		progressBar$.style.display = 'block'
 		emergencyMeeting$.style.display = 'inline'
-		progress$.style.display = 'block'
-	}, 25000);
-  });
+	}, 26000);
+});
 
 enableSound$.addEventListener('click', async () => {
 	console.log('enable sound');
