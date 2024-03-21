@@ -130,6 +130,11 @@ io.on('connection', socket => {
 		io.emit('do-comms');
 	});
 
+	socket.on('reactor', () => {
+		io.emit('do-reactor');
+	});
+
+
 	socket.on('task-complete', taskId => {
 		if (typeof taskProgress[taskId] === 'boolean') {
 			taskProgress[taskId] = true;

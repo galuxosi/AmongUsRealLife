@@ -11,6 +11,7 @@ const progressBar$ = document.querySelector('.progress-bar');
 const report$ = document.querySelector('#report');
 const tasks$ = document.querySelector('#tasks');
 const comms$ = document.querySelector('#comms');
+const reactor$ = document.querySelector('#reactor');
 
 const soundPlayer = new Audio();
 const SOUNDS = {
@@ -21,7 +22,8 @@ const SOUNDS = {
 	voteResult: '/sounds/vote-result.mp3',
 	youLose: '/sounds/you-lose.mp3',
 	youWin: '/sounds/you-win.mp3',
-	comms: '/sounds/comms.mp3'
+	comms: '/sounds/comms.mp3',
+	reactor: '/sounds/reactor_meltdown.mp3'
 };
 
 report$.addEventListener('click', () => {
@@ -49,6 +51,16 @@ comms$.addEventListener('click', () => {
 		emergencyMeeting$.style.display = 'inline'
 	}, 26000);
 })
+
+reactor$.addEventListener('click', () => {
+	socket.emit('reactor')
+	comms$.style.display = 'none';
+	reactor$.style.display = 'none'
+	setTimeout(function() {
+		comms$.style.display = 'inline'
+		reactor$.style.display = 'inline'
+	}, 60000);
+});
 
 socket.on('tasks', tasks => {
 	// Remove existing tasks
@@ -130,11 +142,13 @@ socket.on('do-comms', async () => {
 	tasks$.style.display = 'none'
 	progressBar$.style.display = 'none'
 	emergencyMeeting$.style.display = 'none'
+	reactor$.style.display = 'none'
 	document.getElementById("tasksLabel").innerHTML = "Саботаж зв`язку";
 	document.getElementById("tasksLabel").style.color = "#ff0000";
 	playSound(SOUNDS.comms);
 	setTimeout(function() {
 		comms$.style.display = 'inline'
+		reactor$.style.display = 'inline'
 	}, 60000);
 	setTimeout(function(){
 		document.getElementById("tasksLabel").innerHTML = "Завдання";
@@ -143,6 +157,15 @@ socket.on('do-comms', async () => {
 		progressBar$.style.display = 'block'
 		emergencyMeeting$.style.display = 'inline'
 	}, 26000);
+});
+
+socket.on('do-reactor', async () => {
+	comms$.style.display = 'none';
+	reactor$.style.display = 'none'
+	setTimeout(function() {
+		comms$.style.display = 'inline'
+		reactor$.style.display = 'inline'
+	}, 60000);
 });
 
 enableSound$.addEventListener('click', async () => {

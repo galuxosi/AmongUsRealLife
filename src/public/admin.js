@@ -13,7 +13,7 @@ startGame$.addEventListener('click', () => {
 /**
  * Sounds
  */
-
+	
 async function wait(milliseconds) {
 	await new Promise(resolve => {
 		setTimeout(() => resolve(), milliseconds);
@@ -59,4 +59,8 @@ socket.on('do-comms', async () => {
 		progressBar$.style.display = 'block'
 		emergencyMeeting$.style.display = 'inline'
 	}, 26000);
+});
+
+socket.on('do-reactor', async () => {
+	alert("ЗАПРОШЕНО САБОТАЖ РЕАКТОРА")
 });
