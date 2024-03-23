@@ -33,7 +33,7 @@ const TASKS = [
 	'Реактор: Розсортуйте рахівничку: 3 червоних 1 зелених 4 оранжевих 5 синіх 1 жовтих'
 ];
 const N_TASKS = 5;
-const N_IMPOSTORS = 1;
+const N_IMPOSTORS = 2;
 
 let taskProgress = {};
 
