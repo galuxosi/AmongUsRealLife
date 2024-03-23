@@ -55,6 +55,8 @@ io.on('connection', socket => {
 	);
 
 	socket.on('start-game', () => {
+		io.emit('play-start');
+		
 		// Get player sockets
 		const players = [];
 		for (const [_, socket] of io.of('/').sockets) {
@@ -140,12 +142,14 @@ io.on('connection', socket => {
 			taskProgress[taskId] = true;
 		}
 		emitTaskProgress();
+		io.emit('play-complete');
 	});
 
 	socket.on('task-incomplete', taskId => {
 		if (typeof taskProgress[taskId] === 'boolean') {
 			taskProgress[taskId] = false;
 		}
+		io.emit('play-incomplete');
 
 		emitTaskProgress();
 
