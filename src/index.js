@@ -136,23 +136,18 @@ io.on('connection', socket => {
 		io.emit('do-reactor');
 	});
 
-
 	socket.on('task-complete', taskId => {
 		if (typeof taskProgress[taskId] === 'boolean') {
 			taskProgress[taskId] = true;
 		}
 		emitTaskProgress();
-		io.emit('play-complete');
 	});
 
 	socket.on('task-incomplete', taskId => {
 		if (typeof taskProgress[taskId] === 'boolean') {
 			taskProgress[taskId] = false;
 		}
-		io.emit('play-incomplete');
-
 		emitTaskProgress();
-
 })});
 
 function emitTaskProgress() {
@@ -167,8 +162,3 @@ function emitTaskProgress() {
 }
 
 server.listen(PORT, () => console.log(`Server listening on *:${PORT}`));
-
-// Initialize a cooldown object
-const commsCooldown = {};
-
-// Modify the 'comms' event handler

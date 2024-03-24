@@ -27,6 +27,7 @@ const SOUNDS = {
 	comms: '/sounds/comms.mp3',
 	reactor: '/sounds/reactor_meltdown.mp3',
 	join: '/sounds/join.mp3',
+	leave: '/sounds/leave.mp3',
 	complete: '/sounds/complete.mp3',
 	incomplete: '/sounds/incomplete.ogg'
 };
@@ -158,12 +159,8 @@ socket.on('play-win', async () => {
 	await playSound(SOUNDS.youWin);
 });
 
-socket.on('play-complete', async () => {
-	await playSound(SOUNDS.complete);
-});
-
-socket.on('play-incomplete', async () => {
-	await playSound(SOUNDS.incomplete);
+socket.on('play-disconnect', async () => {
+	await playSound(SOUNDS.leave);
 });
 
 socket.on('do-comms', async () => {
