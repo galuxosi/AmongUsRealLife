@@ -29,7 +29,8 @@ const SOUNDS = {
 	join: '/sounds/join.mp3',
 	leave: '/sounds/leave.mp3',
 	complete: '/sounds/complete.mp3',
-	incomplete: '/sounds/incomplete.ogg'
+	incomplete: '/sounds/incomplete.ogg',
+	button: '/sounds/button.ogg'
 };
 
 window.onload = function() {
@@ -113,16 +114,26 @@ socket.on('tasks', tasks => {
 });
 
 socket.on('role', role => {
-	hideRole();
-	const role$ = document.createElement('a');
-	role$.classList.add('role');
-	role$.appendChild(
-		document.createTextNode(`Ви ${role}. Натисніть щоби приховати`)
-	);
-	role$.onclick = () => hideRole();
+    hideRole();
+    let isRoleHidden = false;
+    const role$ = document.createElement('a');
+    role$.classList.add('role');
+    role$.textContent = `Ви ${role}. Натисніть щоби приховати`;
+    role$.onclick = () => {
+        if (!isRoleHidden) {
+            role$.textContent = 'Натисніть щоби показати роль';
+            isRoleHidden = true;
+        } else {
+            role$.textContent = `Ви ${role}. Натисніть щоби приховати`;
+            isRoleHidden = false;
+        }
+        playSound(SOUNDS.button);
+    }
 
-	document.body.appendChild(role$);
+    document.body.appendChild(role$);    
 });
+
+
 
 function hideRole() {
 	document
