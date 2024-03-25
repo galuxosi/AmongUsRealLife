@@ -190,7 +190,7 @@ socket.on('do-comms', async () => {
 	setTimeout(function(){
 		document.getElementById("tasksLabel").innerHTML = "Завдання";
 		document.getElementById("tasksLabel").style.color = "#000000";
-		tasks$.style.display = 'inline'
+		tasks$.style.display = 'block'
 		progressLabel$.style.display = 'block'
 		emergencyMeeting$.style.display = 'inline'
 	}, 26000);
