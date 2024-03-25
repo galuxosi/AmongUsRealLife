@@ -11,27 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const min = 10000;
-const max = 99999;
-const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
 
-const TASKS = [
-	'Адмін: Проведіть карту',
-	'Адмін: Введіть ID-код: ' + randomNumber,
-	'Адмін: Завантажте дані',
-	'Комунікації: Перезавантажте WiFi',
-	'Турніки: Повесіть на турніку 10 с',
-	'Турніки: Зїдьте з гірки',
-	'Турніки: Присядьте 10 разів',
-	'Турніки: Виконайте "Джампінг Джек" 8 разів',
-	'Лаунж: Отримайте дубль на кубиках',
-	'Лаунж: Відсортуйте кубики за кольором ',
-	'Лаунж: Зберіть 1 сторону кубіка рубіка',
-	'Електрична: Поверніть тестер на 3 режима вперед',
-	'Електрична: Перемкніть рубильник ',
-	'Медпункт: Пройдіть скан',
-	'Реактор: Розсортуйте рахівничку: 3 червоних 1 зелених 4 оранжевих 5 синіх 1 жовтих'
-];
 const N_TASKS = 5;
 const N_IMPOSTORS = 1;
 
@@ -56,7 +36,36 @@ io.on('connection', socket => {
 
 	socket.on('start-game', () => {
 		io.emit('play-start');
-		
+		const min = 10000;
+        const max = 99999;	
+        let randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+
+		const divertPowerOptions = ["Реактор", "Адмін", "Комунікації", "Медпункт"];
+		const randomDivertPowerOption = divertPowerOptions[Math.floor(Math.random() * divertPowerOptions.length)];
+
+		const testerOptions = ["OFF", "200μ", "10A", "hFE", "2000k", "200m", "2000"];
+		const randomTesterOption = testerOptions[Math.floor(Math.random() * testerOptions.length)];
+
+		const TASKS = [
+			'Адмін: Проведіть карту',
+			'Адмін: Введіть ID-код: ' + randomNumber,
+			'Адмін-Комунікації: Завантажте дані',
+			'Комунікації: Перезавантажте WiFi',
+			'Турніки: Повесіть на турніку 10 с',
+			'Турніки: Зїдьте з гірки',
+			'Турніки: Присядьте 10 разів',
+			'Турніки: Виконайте "Джампінг Джек" 8 разів',
+			'Лаунж: Отримайте дубль на кубиках',
+			'Лаунж: Відсортуйте кубики за кольором ',
+			'Лаунж: Зберіть 1 сторону кубіка рубіка',
+			'Електрична: Відкалібруйте тестер на режим ' + randomTesterOption,
+			'Електрична: Перемкніть рубильник ',
+			'Медпункт: Пройдіть скан',
+			'Медпункт: Подрімайте',
+			'Реактор: Розсортуйте рахівничку: 3 червоних 1 зелених 4 оранжевих 5 синіх 1 жовтих',
+			randomDivertPowerOption + ': Подайте енергію'
+		];
+
 		// Get player sockets
 		const players = [];
 		for (const [_, socket] of io.of('/').sockets) {
