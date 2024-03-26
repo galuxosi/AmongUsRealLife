@@ -14,10 +14,17 @@ button {
 	border-radius: 1rem;
 }
 
+
 img {
 	width: 100%;
 }
 
 #enable-sound {
 	display: block;
+}
+
+
+#sabotageButtons {
+	max-width: 20rem;
+	display: flex;
 }
