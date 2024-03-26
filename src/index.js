@@ -13,7 +13,7 @@ const io = new Server(server);
 
 
 const N_TASKS = 5;
-const N_IMPOSTORS = 1;
+const N_IMPOSTORS = 2;
 
 let taskProgress = {};
 
