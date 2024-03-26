@@ -7,13 +7,14 @@ const socket = io({
 const emergencyMeeting$ = document.querySelector('#emergency-meeting');
 const enableSound$ = document.querySelector('#enable-sound');
 const progress$ = document.querySelector('#progress');
-const progressBar$ = document.querySelector('.progress-bar');
+const progressBar$ = document.querySelector('#progress-bar');
 const report$ = document.querySelector('#report');
 const tasks$ = document.querySelector('#tasks');
 const comms$ = document.querySelector('#comms');
 const reactor$ = document.querySelector('#reactor');
 const tasksLabel$ = document.querySelector('#tasksLabel');
 const progressLabel$ = document.querySelector('#progressLabel');
+const oxygen$ = document.querySelector("#oxygen")
 
 const soundPlayer = new Audio();
 const SOUNDS = {
@@ -75,6 +76,18 @@ reactor$.addEventListener('click', () => {
 	reactor$.style.display = 'none'
 	setTimeout(function() {
 		comms$.style.display = 'inline'
+		reactor$.style.display = 'inline'
+	}, 60000);
+});
+
+oxygen$.addEventListener('click', () => {
+	socket.emit('oxygen')
+	comms$.style.display = 'none';
+	reactor$.style.display = 'none';
+	oxygen$.style.display = 'none';
+	setTimeout(function() {
+		comms$.style.display = 'inline'
+		reactor$.style.display = 'inline'
 		reactor$.style.display = 'inline'
 	}, 60000);
 });
@@ -196,7 +209,6 @@ socket.on('do-comms', async () => {
 	}, 26000);
 });
 
-
 socket.on('do-reactor', async () => {
 	comms$.style.display = 'none';
 	reactor$.style.display = 'none'
@@ -204,6 +216,24 @@ socket.on('do-reactor', async () => {
 		comms$.style.display = 'inline'
 		reactor$.style.display = 'inline'
 	}, 60000);
+});
+
+socket.on('do-oxygen', async () => {
+	await console.log("SABOTAGE SENT >:)");
+	await playSound(SOUNDS.reactor);
+	const timeOutOxygen = setTimeout(() => {
+		playSound(SOUNDS.youLose)
+		comms$.style.display = 'inline'
+		reactor$.style.display = 'inline'
+		oxygen$.style.display = 'inline'
+	}, 2000);
+	
+});
+
+socket.on('do-oxygenHasBeenFixed', async () => {
+	await console.log("SABOTAGE FIXED :D");
+	await stopSound()
+	await clearTimeout(timeOutOxygen)
 });
 
 enableSound$.addEventListener('click', async () => {
@@ -217,3 +247,8 @@ async function playSound(url) {
 	await soundPlayer.play();
 }
 
+async function stopSound(url) {
+	soundPlayer.src = url;
+	await soundPlayer.pause();
+	soundPlayer.currentTime = 0;
+}

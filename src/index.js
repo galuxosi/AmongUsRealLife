@@ -25,6 +25,10 @@ app.get('/admin', (req, res) => {
 	res.sendFile(path.join(__dirname, 'views', 'admin.html'));
 });
 
+app.get('/oxygen', (req, res) => {
+	res.sendFile(path.join(__dirname, 'views', 'oxygen.html'));
+});
+
 app.use('/', express.static(path.join(__dirname, 'public')));
 
 io.on('connection', socket => {
@@ -143,6 +147,14 @@ io.on('connection', socket => {
 
 	socket.on('reactor', () => {
 		io.emit('do-reactor');
+	});
+
+	socket.on('oxygen', () => {
+		io.emit('do-oxygen');
+	});
+
+	socket.on('oxygenHasBeenFixed', () => {
+		io.emit('do-oxygenHasBeenFixed');
 	});
 
 	socket.on('task-complete', taskId => {
