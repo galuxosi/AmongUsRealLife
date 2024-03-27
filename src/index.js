@@ -152,6 +152,10 @@ io.on('connection', socket => {
 	socket.on('oxygen', () => {
 		io.emit('do-oxygen');
 	});
+	
+	socket.on('lights', () => {
+		io.emit('do-lights');
+	});
 
 	socket.on('oxygenHasBeenFixed', () => {
 		io.emit('do-oxygenHasBeenFixed');

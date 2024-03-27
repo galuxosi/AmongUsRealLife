@@ -49,15 +49,15 @@ function clearOutput() {
 function submitCode() {
     // Check if 5 digits are entered and alert accordingly
     if (code.toString() === randomCodeOutput) {
+        // Code matches
         socket.emit('oxygenHasBeenFixed')
-		clearOutput()
-		playSound(SOUNDS.accept)
-		randomCode = ''
-    } else {
-		playSound(SOUNDS.failed)
         clearOutput()
+    } else {
+        // Code doesn't match
+        playSound(SOUNDS.failed)
     }
-}T
+    randomCode = ''
+}
 
 
 async function wait(milliseconds) {

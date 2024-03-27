@@ -17,7 +17,6 @@ const comms$ = document.querySelector('#comms');
 const reactor$ = document.querySelector('#reactor');
 const lights$ = document.querySelector("#lights")
 
-lights$.disabled = "disabled";
 reactor$.disabled = "disabled";	
 
 const soundPlayer = new Audio();
@@ -35,7 +34,9 @@ const SOUNDS = {
 	leave: '/sounds/leave.mp3',
 	complete: '/sounds/complete.mp3',
 	incomplete: '/sounds/incomplete.ogg',
-	button: '/sounds/button.ogg'
+	button: '/sounds/button.ogg',
+	accept: '/sounds/idaccepted.ogg',
+	powerdown: '/sounds/powerdown.mp3'
 };
 
 window.onload = function() {
@@ -111,6 +112,34 @@ oxygen$.addEventListener('click', () => {
 	}, 60000);
 });
 
+lights$.addEventListener('click', () => {
+	socket.emit('lights')
+	comms$.style.display = 'none'
+	reactor$.style.display = 'none'
+	lights$.style.display = 'none'
+	oxygen$.style.display = 'none'
+	emergencyMeeting$.style.display = 'none'
+	report$.style.display = 'none'
+	document.getElementById("tasksLabel").innerHTML = "Саботаж світла";
+	document.getElementById("tasksLabel").style.color = "#ff0000";
+	playSound(SOUNDS.powerdown)
+	setTimeout(function() {
+		comms$.style.display = 'inline'
+		reactor$.style.display = 'inline'
+		lights$.style.display = 'inline'
+		oxygen$.style.display = 'inline'
+	}, 60000);
+	setTimeout(function(){
+		document.getElementById("tasksLabel").innerHTML = "Завдання";
+		document.getElementById("tasksLabel").style.color = "#000000";
+		progressBar$.style.display = 'inline'
+		tasks$.style.display = 'inline'
+		progressLabel$.style.display = 'block'
+		emergencyMeeting$.style.display = 'inline'
+		report$.style.display = 'inline'
+	}, 20000);
+})
+
 socket.on('tasks', tasks => {
 	// Remove existing tasks
 	while (tasks$.firstChild) {
@@ -165,8 +194,6 @@ socket.on('role', role => {
     document.body.appendChild(role$);    
 });
 
-
-
 function hideRole() {
 	document
 		.querySelectorAll('.role')
@@ -196,8 +223,6 @@ socket.on('play-meeting', async () => {
 	await playSound(SOUNDS.meeting);
 	await wait(2000);
 	await playSound(SOUNDS.sussyBoy);
-	await stopSound()
-	await clearTimeout(timeOutOxygen)
 });
 
 socket.on('play-win', async () => {
@@ -247,31 +272,63 @@ socket.on('do-reactor', async () => {
 	}, 60000);
 });
 
+let timeOutOxygen;
+
 socket.on('do-oxygen', async () => {
-	await playSound(SOUNDS.reactor);
+  await playSound(SOUNDS.reactor);
+  comms$.style.display = 'none';
+  reactor$.style.display = 'none';
+  lights$.style.display = 'none';
+  oxygen$.style.display = 'none';
+  emergencyMeeting$.style.display = 'none';
+  timeOutOxygen = setTimeout(() => {
+    playSound(SOUNDS.youLose);
+    comms$.style.display = 'inline';
+    reactor$.style.display = 'inline';
+    lights$.style.display = 'inline';
+    oxygen$.style.display = 'inline';
+	emergencyMeeting$.style.display = 'inline';
+  }, 34000);
+  await setTimeout(() => {
+    comms$.style.display = 'inline';
+    reactor$.style.display = 'inline';
+    oxygen$.style.display = 'inline';
+    lights$.style.display = 'inline';
+  }, 60000);
+});
+
+socket.on('do-oxygenHasBeenFixed', async () => {
+	stopSound();
+	clearTimeout(timeOutOxygen);
+	emergencyMeeting$.style.display = 'inline';
+});
+
+
+socket.on('do-lights', async () => {
 	comms$.style.display = 'none'
 	reactor$.style.display = 'none'
 	lights$.style.display = 'none'
 	oxygen$.style.display = 'none'
 	emergencyMeeting$.style.display = 'none'
-	const timeOutOxygen = await setTimeout(() => {
-		playSound(SOUNDS.youLose)
+	report$.style.display = 'none'
+	document.getElementById("tasksLabel").innerHTML = "Саботаж світла";
+	document.getElementById("tasksLabel").style.color = "#ff0000";
+	await playSound(SOUNDS.powerdown)
+	await setTimeout(function() {
 		comms$.style.display = 'inline'
 		reactor$.style.display = 'inline'
-		oxygen$.style.display = 'inline'
-	}, 34000);
-	await setTimeout(() => {
-		comms$.style.display = 'inline'
-		reactor$.style.display = 'inline'
-		oxygen$.style.display = 'inline'
 		lights$.style.display = 'inline'
+		oxygen$.style.display = 'inline'
 	}, 60000);
-
-	socket.on('do-oxygenHasBeenFixed', async () => {
-		await stopSound()
-		await clearTimeout(timeOutOxygen)
+	await setTimeout(function(){
+		document.getElementById("tasksLabel").innerHTML = "Завдання";
+		document.getElementById("tasksLabel").style.color = "#000000";
+		progressBar$.style.display = 'inline'
+		tasks$.style.display = 'inline'
+		progressLabel$.style.display = 'block'
 		emergencyMeeting$.style.display = 'inline'
-	})
+		report$.style.display = 'inline'
+	}, 20000);
 });
 
 enableSound$.addEventListener('click', async () => {
@@ -290,3 +347,5 @@ async function stopSound(url) {
 	await soundPlayer.pause();
 	soundPlayer.currentTime = 0;
 }
+
+// ПАСХАЛКО 1488 Что-то жарко стало включаем вентиляторі
