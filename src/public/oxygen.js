@@ -32,7 +32,6 @@ function generateRandomNumber() {
 	}
 
 function addNumber(number) {
-	// Add number to code if less than 5 digits
 	if (code.length < 5) {
 		code += number;
 		document.getElementById('output').value = code;
@@ -40,20 +39,16 @@ function addNumber(number) {
 }
 
 function clearOutput() {
-	// Clear the output display
 	code = '';
 	document.getElementById('output').value = code;
 	playFail();
 }
 
 function submitCode() {
-    // Check if 5 digits are entered and alert accordingly
     if (code.toString() === randomCodeOutput) {
-        // Code matches
         socket.emit('oxygenHasBeenFixed')
         clearOutput()
     } else {
-        // Code doesn't match
         playSound(SOUNDS.failed)
     }
     randomCode = ''
