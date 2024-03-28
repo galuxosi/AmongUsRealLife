@@ -20,9 +20,11 @@ img {
 }
 
 #enable-sound {
-	display: block;
+	display: inline;
 }
-
+#dead {
+	display: inline;
+}
 
 #sabotageButtons {
 	max-width: 20rem;
