@@ -13,9 +13,10 @@ const io = new Server(server);
 
 
 const N_TASKS = 5;
-const N_IMPOSTORS = 3;
+const N_IMPOSTORS = 1;
 
 let taskProgress = {};
+let reactorProgress = 0;
 
 app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname, 'views', 'index.html'));
@@ -27,6 +28,10 @@ app.get('/admin', (req, res) => {
 
 app.get('/oxygen', (req, res) => {
 	res.sendFile(path.join(__dirname, 'views', 'oxygen.html'));
+});
+
+app.get('/reactor', (req, res) => {
+	res.sendFile(path.join(__dirname, 'views', 'reactor.html'));
 });
 
 app.use('/', express.static(path.join(__dirname, 'public')));
@@ -50,6 +55,12 @@ io.on('connection', socket => {
 		const testerOptions = ["OFF", "200μ", "10A", "hFE", "2000k", "200m", "2000"];
 		const randomTesterOption = testerOptions[Math.floor(Math.random() * testerOptions.length)];
 
+		var rah1 = Math.floor(Math.random() * 10);
+		var rah2 = Math.floor(Math.random() * 10);
+		var rah3 = Math.floor(Math.random() * 10);
+		var rah4 = Math.floor(Math.random() * 10);
+		var rah5 = Math.floor(Math.random() * 10);
+
 		const TASKS = [
 			'Адмін: Проведіть карту',
 			'Адмін: Введіть ID-код: ' + randomNumber,
@@ -67,7 +78,7 @@ io.on('connection', socket => {
 			'Електрична: Подайте енергію: `' + randomDivertPowerOption + "`",
 			'Медпункт: Пройдіть скан',
 			'Медпункт: Подрімайте',
-			'Реактор: Розсортуйте рахівничку: 3 червоних 1 зелених 4 оранжевих 5 синіх 1 жовтих',
+			'Реактор: Розсортуйте рахівничку: ' + rah1 + ' червоних ' + rah2 + ' зелених ' + rah3 + ' оранжевих ' + rah4 + ' синіх ' + rah5 + ' жовтих',
 		];
 
 		// Get player sockets
@@ -149,6 +160,15 @@ io.on('connection', socket => {
 		io.emit('do-reactor');
 	});
 
+	socket.on('reactorFixed', () => {
+		io.emit('do-reactorFixed');
+		reactorProgress += 1
+		if (reactorProgress == 2) { 
+			io.emit('do-reactorFixedFully') 
+			reactorProgress = 0 
+		}
+	});
+
 	socket.on('oxygen', () => {
 		io.emit('do-oxygen');
 	});
@@ -173,6 +193,7 @@ io.on('connection', socket => {
 			taskProgress[taskId] = false;
 		}
 		emitTaskProgress();
+
 })});
 
 function emitTaskProgress() {
