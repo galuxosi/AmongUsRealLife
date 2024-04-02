@@ -18,8 +18,7 @@ const reactor$ = document.querySelector('#reactor');
 const lights$ = document.querySelector("#lights")
 
 let countdownInterval;
-
-reactor$.disabled = "disabled";	
+let timeOutOxygen;
 
 const soundPlayer = new Audio();
 const SOUNDS = {
@@ -41,7 +40,6 @@ const SOUNDS = {
 	powerdown: '/sounds/powerdown.mp3'
 };
 
- // seconds
 window.onload = function() {
 	playSound(SOUNDS.join);
 }
@@ -264,68 +262,7 @@ socket.on('do-comms', async () => {
 	}, 26000);
 });
 
-socket.on('do-reactor', async () => {
-	comms$.style.display = 'none'
-	reactor$.style.display = 'none'
-	lights$.style.display = 'none'
-	oxygen$.style.display = 'none'
-	setTimeout(function() {
-		comms$.style.display = 'inline'
-		reactor$.style.display = 'inline'
-		oxygen$.style.display = 'inline'
-		lights$.style.display = 'inline'
-	}, 60000);
-});
-
-let timeOutOxygen;
-
-socket.on('do-oxygen', async () => {
-  timeLeft = 30; 
-  await playSound(SOUNDS.reactor);
-  comms$.style.display = 'none';
-  reactor$.style.display = 'none';
-  lights$.style.display = 'none';
-  oxygen$.style.display = 'none';
-  emergencyMeeting$.style.display = 'none';
-  document.getElementById("tasksLabel").innerHTML = "Саботаж кисню " + timeLeft;
-  document.getElementById("tasksLabel").style.color = "#ff0000";
-  timeOutOxygen = setTimeout(() => {
-    playSound(SOUNDS.youLose);
-    comms$.style.display = 'inline';
-    reactor$.style.display = 'inline';
-    lights$.style.display = 'inline';
-    oxygen$.style.display = 'inline';
-	emergencyMeeting$.style.display = 'inline';
-	timeLeft = 30; // Reset the timer
-	document.getElementById("tasksLabel").innerHTML = "Завдання";
-	document.getElementById("tasksLabel").style.color = "#000000";
-	if (window.currentOxygenCountdown) {
-		clearInterval(window.currentOxygenCountdown);
-		window.currentOxygenCountdown = null;
-	}
-  }, 30000);
-  await setTimeout(() => {
-    comms$.style.display = 'inline';
-    reactor$.style.display = 'inline';
-    oxygen$.style.display = 'inline';
-    lights$.style.display = 'inline';
-  }, 60000);
-  const countdownInterval = setInterval(() => {
-    timeLeft -= 1;
-    document.getElementById("tasksLabel").innerHTML = "Саботаж кисню " + timeLeft;
-    
-    if (timeLeft <= 0) {
-      clearInterval(countdownInterval);
-      playSound(SOUNDS.youLose); // Example action when the countdown ends
-      // Re-enable buttons here if necessary
-    }
-  }, 1000);
-
-  // Save the interval ID to clear it when oxygen is fixed
-  window.currentOxygenCountdown = countdownInterval;
-});
-
-socket.on('do-oxygenHasBeenFixed', async () => {
+socket.on('do-reactorFixedFully', async () => {
 	stopSound();
 	clearTimeout(timeOutOxygen);
 	emergencyMeeting$.style.display = 'inline';
@@ -333,12 +270,116 @@ socket.on('do-oxygenHasBeenFixed', async () => {
 		clearInterval(window.currentOxygenCountdown);
 		window.currentOxygenCountdown = null;
 	}
-	timeLeft = 30; // Reset the timer
+	timeLeft = 30; 
 	document.getElementById("tasksLabel").innerHTML = "Завдання";
 	document.getElementById("tasksLabel").style.color = "#000000";
 	emergencyMeeting$.style.display = 'inline';
 });
 
+socket.on('do-reactor', async () => {
+	timeLeft = 30; 
+	await playSound(SOUNDS.reactor);
+	comms$.style.display = 'none';
+	reactor$.style.display = 'none';
+	lights$.style.display = 'none';
+	oxygen$.style.display = 'none';
+	emergencyMeeting$.style.display = 'none';
+	document.getElementById("tasksLabel").innerHTML = "Саботаж реактору " + timeLeft;
+	document.getElementById("tasksLabel").style.color = "#ff0000";
+	timeOutOxygen = setTimeout(() => {
+		playSound(SOUNDS.youLose);
+		comms$.style.display = 'inline';
+		reactor$.style.display = 'inline';
+		lights$.style.display = 'inline';
+		oxygen$.style.display = 'inline';
+		emergencyMeeting$.style.display = 'inline';
+		timeLeft = 30;
+		document.getElementById("tasksLabel").innerHTML = "Завдання";
+		document.getElementById("tasksLabel").style.color = "#000000";
+		if (window.currentOxygenCountdown) {
+			clearInterval(window.currentOxygenCountdown);
+			window.currentOxygenCountdown = null;
+		}
+	}, 30000);
+
+	await setTimeout(() => {
+		comms$.style.display = 'inline';
+		reactor$.style.display = 'inline';
+		oxygen$.style.display = 'inline';
+		lights$.style.display = 'inline';
+	}, 60000);
+
+	const countdownInterval = setInterval(() => {
+	timeLeft -= 1;
+	document.getElementById("tasksLabel").innerHTML = "Саботаж реактору " + timeLeft;
+
+	if (timeLeft <= 0) {
+		clearInterval(countdownInterval);
+		playSound(SOUNDS.youLose);
+	}
+	}, 1000);
+
+	window.currentOxygenCountdown = countdownInterval;
+});
+
+socket.on('do-oxygen', async () => {
+	timeLeft = 30; 
+	await playSound(SOUNDS.reactor);
+	comms$.style.display = 'none';
+	reactor$.style.display = 'none';
+	lights$.style.display = 'none';
+	oxygen$.style.display = 'none';
+	emergencyMeeting$.style.display = 'none';
+	document.getElementById("tasksLabel").innerHTML = "Саботаж кисню " + timeLeft;
+	document.getElementById("tasksLabel").style.color = "#ff0000";
+	timeOutOxygen = setTimeout(() => {
+		playSound(SOUNDS.youLose);
+		comms$.style.display = 'inline';
+		reactor$.style.display = 'inline';
+		lights$.style.display = 'inline';
+		oxygen$.style.display = 'inline';
+		emergencyMeeting$.style.display = 'inline';
+		timeLeft = 30;
+		document.getElementById("tasksLabel").innerHTML = "Завдання";
+		document.getElementById("tasksLabel").style.color = "#000000";
+		if (window.currentOxygenCountdown) {
+			clearInterval(window.currentOxygenCountdown);
+			window.currentOxygenCountdown = null;
+	}}, 30000);
+
+	await setTimeout(() => {
+	comms$.style.display = 'inline';
+	reactor$.style.display = 'inline';
+	oxygen$.style.display = 'inline';
+	lights$.style.display = 'inline';
+	}, 60000);
+
+	const countdownInterval = setInterval(() => {
+	timeLeft -= 1;
+	document.getElementById("tasksLabel").innerHTML = "Саботаж кисню " + timeLeft;
+
+	if (timeLeft <= 0) {
+		clearInterval(countdownInterval);
+		playSound(SOUNDS.youLose);
+	}
+	}, 1000);
+
+	window.currentOxygenCountdown = countdownInterval;
+	});
+
+	socket.on('do-oxygenHasBeenFixed', async () => {
+	stopSound();
+	clearTimeout(timeOutOxygen);
+	emergencyMeeting$.style.display = 'inline';
+	if (window.currentOxygenCountdown) {
+		clearInterval(window.currentOxygenCountdown);
+		window.currentOxygenCountdown = null;
+	}
+	timeLeft = 30; 
+	document.getElementById("tasksLabel").innerHTML = "Завдання";
+	document.getElementById("tasksLabel").style.color = "#000000";
+	emergencyMeeting$.style.display = 'inline';
+});
 
 socket.on('do-lights', async () => {
 	comms$.style.display = 'none'
