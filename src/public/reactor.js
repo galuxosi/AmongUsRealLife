@@ -7,10 +7,6 @@ const socket = io({
 const fix$ = document.querySelector('#reactorFix');
 const image = document.getElementById('reactorImage');
 
-socket.on('do-reactor', async () => {
-	
-});
-
 const soundPlayer = new Audio();
 const SOUNDS = {
     // sounds
@@ -18,25 +14,28 @@ const SOUNDS = {
 
 fix$.addEventListener('click', () => {
 	socket.emit("reactorFixed")
-    image.src = 'images/reactor_wait.webp';
+    image.src = 'images/reactor_wait.png';
+	yourImg.style.height = '1000px';
+    yourImg.style.width = '1000px';
 })
 
 socket.on('do-reactor', async () => {
-    image.src = 'images/reactor_hold.webp';
-})
+    image.src = 'images/reactor_hold.png';
+	yourImg.style.height = '1000px';
+    yourImg.style.width = '1000px';
+})	
 
 socket.on('do-reactorFixedFully', async () => {
     image.src = 'images/reactor_nominal.webp';
+	yourImg.style.height = '1000px';
+    yourImg.style.width = '1000px';
 })
-
 
 async function wait(milliseconds) {
 	await new Promise(resolve => {
 		setTimeout(() => resolve(), milliseconds);
 	});
 }
-// JavaScript functions to handle button clicks
-
 
 async function playSound(url) {
 	soundPlayer.src = url;
