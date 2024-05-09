@@ -108,10 +108,7 @@ oxygen$.addEventListener('click', () => {
 	lights$.style.display = 'none'
 	oxygen$.style.display = 'none'
 	emergencyMeeting$.style.display = 'none'
-<<<<<<< Updated upstream
-=======
 	sabotageActive = true
->>>>>>> Stashed changes
 	document.getElementById("tasksLabel").innerHTML = "Саботаж кисню " + timeLeft;
 	document.getElementById("tasksLabel").style.color = "#ff0000";
 	setTimeout(function() {
