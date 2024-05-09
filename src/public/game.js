@@ -352,14 +352,18 @@ socket.on('do-reactor', async () => {
 
 socket.on('do-oxygen', async () => {
 	timeLeft = 30; 
+
 	await playSound(SOUNDS.reactor);
+
 	comms$.style.display = 'none';
 	reactor$.style.display = 'none';
 	lights$.style.display = 'none';
 	oxygen$.style.display = 'none';
 	emergencyMeeting$.style.display = 'none';
+
 	document.getElementById("tasksLabel").innerHTML = "Саботаж кисню " + timeLeft;
 	document.getElementById("tasksLabel").style.color = "#ff0000";
+
 	timeOutOxygen = setTimeout(() => {
 		playSound(SOUNDS.youLose);
 		comms$.style.display = 'inline';
@@ -373,36 +377,37 @@ socket.on('do-oxygen', async () => {
 		if (window.currentOxygenCountdown) {
 			clearInterval(window.currentOxygenCountdown);
 			window.currentOxygenCountdown = null;
-	}}, 30000);
+		}
+	}, 30000);
 
 	await setTimeout(() => {
-	comms$.style.display = 'inline';
-	reactor$.style.display = 'inline';
-	oxygen$.style.display = 'inline';
-	lights$.style.display = 'inline';
+		comms$.style.display = 'inline';
+		reactor$.style.display = 'inline';
+		oxygen$.style.display = 'inline';
+		lights$.style.display = 'inline';
 	}, 60000);
 
 	const countdownInterval = setInterval(() => {
-	timeLeft -= 1;
-	document.getElementById("tasksLabel").innerHTML = "Саботаж кисню " + timeLeft;
+		timeLeft -= 1;
+		document.getElementById("tasksLabel").innerHTML = "Саботаж кисню " + timeLeft;
 
-	if (timeLeft <= 0) {
-		clearInterval(countdownInterval);
-		playSound(SOUNDS.youLose);
-	}
-	}, 1000);
-
+		if (timeLeft <= 0) {
+			clearInterval(countdownInterval);
+			playSound(SOUNDS.youLose);
+		}}, 1000);
 	window.currentOxygenCountdown = countdownInterval;
 	});
 
-	socket.on('do-oxygenHasBeenFixed', async () => {
+socket.on('do-oxygenHasBeenFixed', async () => {
 	stopSound();
 	clearTimeout(timeOutOxygen);
 	emergencyMeeting$.style.display = 'inline';
+
 	if (window.currentOxygenCountdown) {
 		clearInterval(window.currentOxygenCountdown);
 		window.currentOxygenCountdown = null;
 	}
+
 	timeLeft = 30; 
 	document.getElementById("tasksLabel").innerHTML = "Завдання";
 	document.getElementById("tasksLabel").style.color = "#000000";
