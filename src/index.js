@@ -34,6 +34,10 @@ app.get('/reactor', (req, res) => {
 	res.sendFile(path.join(__dirname, 'views', 'reactor.html'));
 });
 
+app.get('/camera', (req, res) => {
+	res.sendFile(path.join(__dirname, 'views', 'camera.html'));
+});
+
 app.use('/', express.static(path.join(__dirname, 'public')));
 
 io.on('connection', socket => {
@@ -155,7 +159,6 @@ io.on('connection', socket => {
 	socket.on('comms', () => {
 		io.emit('do-comms');
 	});
-
 	socket.on('reactor', () => {
 		io.emit('do-reactor');
 	});
