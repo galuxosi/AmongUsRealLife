@@ -28,7 +28,8 @@ const SOUNDS = {
 	voteResult: new Audio('/sounds/vote-result.mp3'),
 	youLose: new Audio('/sounds/you-lose.mp3'),
 	youWin: new Audio('/sounds/you-win.mp3'),
-	comms: new Audio('/sounds/comms.mp3')
+	comms: new Audio('/sounds/comms.mp3'),
+	reactorMeltdown: new Audio('/sounds/reactor_meltdown.mp3')
 };
 
 socket.on('play-meeting', async () => {
@@ -46,5 +47,5 @@ socket.on('do-comms', async () => {
 });
 
 socket.on('do-reactor', async () => {
-	alert("ЗАПРОШЕНО САБОТАЖ РЕАКТОРА")
+	playSound(SOUNDS.reactorMeltdown);
 });

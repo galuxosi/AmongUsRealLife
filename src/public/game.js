@@ -68,7 +68,6 @@ comms$.addEventListener('click', () => {
 	emergencyMeeting$.style.display = 'none'
 	document.getElementById("tasksLabel").innerHTML = "Саботаж зв`язку";
 	document.getElementById("tasksLabel").style.color = "#ff0000";
-	playSound(SOUNDS.comms);
 	setTimeout(function() {
 		comms$.style.display = 'inline'
 		reactor$.style.display = 'inline'
@@ -167,10 +166,8 @@ socket.on('tasks', tasks => {
 			console.log('checkbox change', event.target.checked);
 			if (event.target.checked) {
 				socket.emit('task-complete', taskId);
-				playSound(SOUNDS.complete);
 			} else {
 				socket.emit('task-incomplete', taskId);
-				playSound(SOUNDS.incomplete);
 			}
 		};
 

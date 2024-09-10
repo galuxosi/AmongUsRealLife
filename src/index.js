@@ -53,8 +53,18 @@ io.on('connection', socket => {
         const max = 99999;	
         let randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
 
-		const divertPowerOptions = ["Реактор", "Адмін", "Комунікації", "Медпункт"];
+		// const divertPowerOptions = ["Реактор", "Адмін", "Комунікації", "Медпункт"];
+		const divertPowerOptions = ["Адмін", "Медпункт", "Комунікації", "Коридор", "Вітальня"];
 		const randomDivertPowerOption = divertPowerOptions[Math.floor(Math.random() * divertPowerOptions.length)];
+
+		const downloadDataOptions = ["Адмін", "Медпункт", "Електрична", "Коридор", "Вітальня"];
+		const randonDownloadDataOption = downloadDataOptions[Math.floor(Math.random() * downloadDataOptions.length)];
+
+		const buttonRemote = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "10+", "увімк/вимк"];
+		const randomButtonRemote = buttonRemote[Math.floor(Math.random() * buttonRemote.length)];
+
+		const colorRemote = ["ЧЕРВОНОГО", "ЗЕЛЕНОГО", "СИНЬОГО", "ЖОВТОГО", "РОЖЕВОГО", "ОРАНЖЕВОГО"];
+		const randomColorRemote = colorRemote[Math.floor(Math.random() * colorRemote.length)];
 
 		const testerOptions = ["OFF", "200μ", "10A", "hFE", "2000k", "200m", "2000"];
 		const randomTesterOption = testerOptions[Math.floor(Math.random() * testerOptions.length)];
@@ -68,22 +78,29 @@ io.on('connection', socket => {
 		const TASKS = [
 			'Адмін: Проведіть карту',
 			'Адмін: Введіть ID-код: ' + randomNumber,
-			'Адмін-Комунікації: Завантажте дані',
+			randonDownloadDataOption + ': Завантажте і відправте дані ⚠️',
 			'Комунікації: Перезавантажте WiFi',
-			'Турніки: Повесіть на турніку 10 с',
-			'Турніки: Присядьте 10 разів',
-			'Турніки: Виконайте "Джампінг Джек" 8 разів',
-			'Турніки: З`їздьте з гірки',
-			'Лаунж: Розсортуйте кубики за кольором',
-			'Лаунж: Зберіть 1 сторону кубіка Рубіка',
-			'Лаунж: Отримайте дубль на кубиках',
-			'Електрична: Відкалібруйте тестер на режим ' + randomTesterOption,
 			'Електрична: Перемкніть рубильник ',
-			'Електрична: Подайте енергію: `' + randomDivertPowerOption + "`",
+			'Електрична: Подайте енергію: `' + randomDivertPowerOption + "` ⚠️",
 			'Медпункт: Пройдіть скан',
 			'Медпункт: Подрімайте',
-			'Реактор: Розсортуйте рахівничку: ' + rah1 + ' червоних ' + rah2 + ' зелених ' + rah3 + ' оранжевих ' + rah4 + ' синіх ' + rah5 + ' жовтих',
+			'Комунікації: Впімайте сигнал',
+			'Реактор: Натисніть на пульті кнопку ' + '"' + randomButtonRemote + '"',
+			'Реактор: Натисніть на RGB пульті кнопку ' + randomColorRemote + ' кольору',
+			'ПК: Запустіть перевірку даних',
+			'ПК: Запустіть антивірус',
+			'ПК: Очистіть корзину',
+
+			// 'Розсортуйте кубики за кольором',
+			// 'Зберіть 1 сторону кубіка Рубіка',
+			// 'Отримайте дубль на кубиках',
 		];
+			// 'Розсортуйте рахівничку: ' + rah1 + ' червоних ' + rah2 + ' зелених ' + rah3 + ' оранжевих ' + rah4 + ' синіх ' + rah5 + ' жовтих',
+			// 'Повесіть на турніку 10 с',
+			// 'Присядьте 10 разів',
+			// 'Виконайте "Джампінг Джек" 8 разів',
+			// 'З`їздьте з гірки',
+			// 'Відкалібруйте тестер на режим ' + randomTesterOption,
 
 		// Get player sockets
 		const players = [];
