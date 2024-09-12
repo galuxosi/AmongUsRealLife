@@ -57,7 +57,7 @@ io.on('connection', socket => {
 		const divertPowerOptions = ["Адмін", "Медпункт", "Комунікації", "Коридор", "Вітальня"];
 		const randomDivertPowerOption = divertPowerOptions[Math.floor(Math.random() * divertPowerOptions.length)];
 
-		const downloadDataOptions = ["Адмін", "Медпункт", "Електрична", "Коридор", "Вітальня"];
+		const downloadDataOptions = ["Кухня", "Комунікації", "Електрична", "Коридор", "Вітальня"];
 		const randonDownloadDataOption = downloadDataOptions[Math.floor(Math.random() * downloadDataOptions.length)];
 
 		const buttonRemote = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "10+", "увімк/вимк"];
@@ -78,18 +78,18 @@ io.on('connection', socket => {
 		const TASKS = [
 			'Адмін: Проведіть карту',
 			'Адмін: Введіть ID-код: ' + randomNumber,
-			randonDownloadDataOption + ': Завантажте і відправте дані ⚠️',
-			'Комунікації: Перезавантажте WiFi',
+			'Електрична: Натисніть на пульті кнопку ' + '"' + randomButtonRemote + '"',
+			'Електрична: Натисніть на RGB пульті кнопку ' + randomColorRemote + ' кольору',
 			'Електрична: Перемкніть рубильник ',
 			'Електрична: Подайте енергію: `' + randomDivertPowerOption + "` ⚠️",
 			'Медпункт: Пройдіть скан',
 			'Медпункт: Подрімайте',
 			'Комунікації: Впімайте сигнал',
-			'Реактор: Натисніть на пульті кнопку ' + '"' + randomButtonRemote + '"',
-			'Реактор: Натисніть на RGB пульті кнопку ' + randomColorRemote + ' кольору',
+			'Комунікації: Перезавантажте WiFi',
 			'ПК: Запустіть перевірку даних',
 			'ПК: Запустіть антивірус',
 			'ПК: Очистіть корзину',
+			randonDownloadDataOption + ': Завантажте і відправте дані ⚠️',
 
 			// 'Розсортуйте кубики за кольором',
 			// 'Зберіть 1 сторону кубіка Рубіка',
