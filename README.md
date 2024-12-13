@@ -13,7 +13,7 @@
 
 ## Скріншот (оригінал репозиторію)
 
-<img src="media/IMG_0976.PNG" width="50%" />
+![Screenshot_20241213_212836_Chrome](https://github.com/user-attachments/assets/18261f28-91c6-4e4b-89f6-4c58c9180bed)
 
 ## Використання
 
