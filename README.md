@@ -1,55 +1,54 @@
-# Among Us in real life
+# Амонг ас в реальному житті
 
-I hacked together this small little web app for facilitating a game of Among Us in real life.
+Форк репозиторію від michaelgira23
 
-## Features
+## Особливості
 
--   Assign impostors/crewmates
--   Assign tasks
--   Checking off tasks updates a global progress bar in real-time
+-   Призначати зрадників/членів екіпажу
+-   Призначати завдання
+-   Позначання завдань виконаними заповнює глобальну шкалу прогресу
 
-Audio recordings from [https://www.voicy.network/pages/among-us](https://www.voicy.network/pages/among-us)
+Аудіо взято з [https://www.voicy.network/pages/among-us](https://www.voicy.network/pages/among-us)
 
-## Screenshot
+## Скріншот (оригінал репозиторію)
 
 <img src="media/IMG_0976.PNG" width="50%" />
 
-## Usage
+## Використання
 
-This was built for personal use, but anyone is welcome to use this for hosting their own game.
+Я доповнив цей сайт для гри з друзями, але ви також можете використовувати цей репозиторій для гри з друзями
 
-### 1. Configure the game
+### 1. Конфігурація гри
 
-You may want to modify the following properties located in [`src/index.js`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js):
+Налаштувати гру можна [`src/index.js`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js):
 
-[`TASKS`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js#L14) - An array of strings that consist of all possible tasks. These will be randomly assigned to players.
+[`TASKS`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js#L14) - Список всіх завданнь, що випадково призначаються кожному гравцеві
 
-[`N_TASKS`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js#L31) - Number of tasks to assign each player
+[`N_TASKS`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js#L31) - Кількість завданнь, що призначаються одному гравцеві.
 
-[`N_IMPOSTORS`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js#L32) - Number of impostors to assign each round
+[`N_IMPOSTORS`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js#L32) - Кількість зрадників.
 
-### 2. Start the backend
+### 2. Запустити бекенд
 
-Start the backend with
+Запустіть бекенд використовуючи
 
 ```
 $ npm install
 $ npm start
 ```
 
-:information_source: Use a utility like [Nodemon](https://nodemon.io/) to automatically restart the backend upon any changes. This is useful when modifying the number of impostors or tasks.
 
-### 3. Connect to the admin dashboard
+### 3. Приєднайтесь до панелі керування
 
-Visit [http://localhost:4046/admin](http://localhost:4046/admin) to access the admin panel. There is a single button to start the game.
+Зайдіть на [http://localhost:4046/admin](http://localhost:4046/admin) щоби отримати доступ до панелі керування. Тут є лише одна кнопка щоби почати гру.
 
-Pressing the start button will reset task progress, assign new tasks, and assign impostors. Press it once all players connect, otherwise you will have to press it again.
+Натиснення кнопки призведе до скидання шкали прогресу завдань, призначення нових предателів та нових задавннь. Натискайте її коли всі гравці приєднаються, інакше вам прийдеться нажати її ще раз.
 
-### 4. Invite friends to join
+### 4. Запросіть друзів
 
-Players may access the the game at [http://localhost:4046](http://localhost:4046). On other computers (or phones), you will need to enter the computer's local IP or use a tunneling service like [ngrok](https://ngrok.com). Alternatively, you could deploy this yourself.
+Гравці можуть отримати доступ до гри через [http://localhost:4046](http://localhost:4046). На інших комп’ютерах (або телефонах) вам потрібно буде ввести локальну IP-адресу комп’ютера або скористатися службою тунелювання, наприклад [ngrok](https://ngrok.com). Крім того, ви можете запустити сайт самостійно.
 
-## Known issues
+## Відомі баги
 
--   Sometimes, duplicate tasks are assigned (temporary workaround is to start another game)
--   On some Android phones, hiding the browser will reset its state, therefore losing your tasks
+-   Деколи, завдання дублються. (В таких випадках, ми робили завдання двічі)
+-   На деяких телефонах Android приховування веб-переглядача призведе до його перезагрузки, що призведе до втрати ваших завдань. (можна спробувати вимкнути оптимізацію батареї браузера)
