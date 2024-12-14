@@ -1,66 +1,112 @@
-# Амонг ас в реальному житті
+# Among Us in real life
 
-Форк репозиторію від [michaelgira23](https://github.com/michaelgira23/among-us-real-life)
+## Overview
+This is a fork of michaelgira23 repository. I forked it and upgraded it.
 
-## Особливості
+## Features
+- Assign roles as Impostors or Crewmates.
+- Randomly distribute tasks to players.
+- Checking task as done will fill the global task progress.
+- 4 sabotages available.
+- CCTV Camera that connected to the game.
+- Simple and intuitive interface for managing the game.
 
--   Призначати зрадників/членів екіпажу
--   Призначати завдання
--   Позначання завдань виконаними заповнює глобальну шкалу прогресу
--   4 різних саботажів
--   Перемикання видимості ролі
--   Сайт для камери, що працює через Droidcam
+## Installation
+To set up the project locally, follow these steps:
 
-Аудіо взято з [https://www.voicy.network/pages/among-us](https://www.voicy.network/pages/among-us)
+1. **Prerequisites**:
+   - Ensure you have [Node.js](https://nodejs.org/) installed.
 
-## Скріншот (оригінал репозиторію)
+2. **Clone the Repository**:
+   ```bash
+   git clone (https://github.com/galuxosi/AmongUsRealLife.git)
+   cd AmongUsRealLife
+   ```
 
-![Screenshot_20241213_212836_Chrome](https://github.com/user-attachments/assets/18261f28-91c6-4e4b-89f6-4c58c9180bed)
+3. **Install Dependencies**:
+   ```bash
+   npm install
+   npm ci
+   npm install --include=dev
+   ```
 
-## Використання
+4. **Sabotages setup (Optional)**
+   - Identify the devices or systems you want to use for sabotage tasks (e.g., laptops, tablets, or smartphones).
+   - Deploy sabotage-specific web pages or applications to these devices. These can simulate sabotages like reactor meltdown or oxygen depletion.
+   - Specific requirements for sabotages:
+     - **Reactor Sabotage**: Requires **2 devices**. Players must interact with both devices simultaneously to fix the sabotage. Visit [http://localhost:5001/reactor](http://localhost:5001/reactor) on both devices.
+     - **Oxygen Sabotage**: Requires **1 device** for players to input the oxygen code. Visit [http://localhost:5001/oxygen](http://localhost:5001/oxygen) on the device.
+     - **Other Sabotages**: Do not require additional devices.
+   - If you do not want to use any sabotages, you just can delete them from the code, or just ignore the buttons.
 
-Я доповнив зробив(форкнув) цей репозиторій для гри з друзями, але ви також можете використовувати цей репозиторій для своїх ігор.
+5. **[BETA] Camera setup (Optional)**
+   - Take a device that would be used as CCTV. It must have an installed DroidCam on it.
+   - Change the DroidCam's IP in [`src="..."`](https://github.com/galuxosi/AmongUsRealLife/blob/main/src/views/camera.html)
+   - Take an another device and visit a [http://localhost:5001/camera](http://localhost:5001/camera). This device will be used for watching the camera.
+   - Make sure the camera is working and you can see an image from it on another device.
+   - Install the camera on place it must filming.
 
-### 1. Конфігурація гри
+7. **Start the Backend**:
+   ```bash
+   npm start
+   ```
 
-Налаштувати гру можна [`src/index.js`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js):
+8. **Access the Admin Panel**:
+   Open [http://localhost:5001/admin](http://localhost:5001/admin) in your browser to manage the game.
 
-[`TASKS`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js#L14) - Список всіх завданнь, що випадково призначаються кожному гравцеві
+9. **Connect Players**:
+   Players can join via [http://localhost:5001](http://localhost:5001) or by connecting to the local IP address of the host.
 
-[`N_TASKS`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js#L31) - Кількість завданнь, що призначаються одному гравцеві.
 
-[`N_IMPOSTORS`](https://github.com/michaelgira23/among-us-real-life/blob/master/src/index.js#L32) - Кількість зрадників.
 
-### 2. Запустити бекенд
-
-Запустіть бекенд використовуючи
+## Folder Structure
 
 ```
-$ npm install
-$ npm start
+project_root
+├── src                # Game logic
+├── public             # Frontend assets
+├── config             # Configuration files
+├── .gitignore         # Git ignore rules
+├── package.json       # Node.js dependencies
+└── README.md          # Project overview
 ```
 
+## Configuration
+The game can be customized by modifying the following properties in `src/index.js`:
 
-### 3. Приєднайтесь до панелі керування
+- **`TASKS`**: An array of task descriptions assigned to players.
+- **`N_TASKS`**: Number of tasks assigned to each player.
+- **`N_IMPOSTORS`**: Number of Impostors in the game.
 
-Зайдіть на [http://localhost:4046/admin](http://localhost:4046/admin) щоби отримати доступ до панелі керування. Тут є лише одна кнопка щоби почати гру.
+Example:
+```javascript
+const TASKS = [
+  "Swipe card",
+  "Fix wiring",
+  "Upload data",
+];
+const N_TASKS = 3;
+const N_IMPOSTORS = 2;
+```
 
-Натиснення кнопки призведе до скидання шкали прогресу завдань, призначення нових предателів та нових задавннь. Натискайте її коли всі гравці приєднаються, інакше вам прийдеться нажати її ще раз.
+## How to Play
+1. **Configure the Game**:
+   - Set the desired number of tasks and Impostors in `index.js`.
+2. **Start the Backend**:
+   - Run `npm start` and ensure the server is active.
+3. **Join the Game**:
+   - Have players connect to the provided URL.
+4. **Begin Gameplay**:
+   - Use the admin panel to start the game.
 
-### 4. Запросіть друзів
+## Contribution
+Contributions are welcome! Follow these steps to contribute:
 
-Гравці можуть отримати доступ до гри через [http://localhost:4046](http://localhost:4046). На інших комп’ютерах (або телефонах) вам потрібно буде ввести локальну IP-адресу комп’ютера або скористатися службою тунелювання, наприклад [ngrok](https://ngrok.com). Крім того, ви можете запустити сайт самостійно.
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix.
+3. Commit your changes.
+4. Open a pull request.
 
-### 5. Налаштування саботажів
+## License
+This project is licensed under the [GPL-3.0 License](LICENSE).
 
-Якщо ви бажаєте використовувати саботажі, вам необхідно ще 3 пристроя для цього(1 на саботаж кисню, 2 на саботаж реактору). На кожному пристрої зайдіть на сайт із саботажем, а також вимкніть функцію гасіння екрану через деякий час.
-
-### 6. Камера
-
-Якщо ви бажаєте мати камеру відеоспостереження, вам необхідно мати пристрій з встановленим Droidcam. Після цього вам треба прив'язати IP-адресу Droidcam до гри [`src="ip"`](https://github.com/galuxosi/AmongUsRealLife/blob/main/src/views/camera.html). Після цього вам необхідно зайти з іншого пристроя на сайт [http://localhost:4046/camera](http://localhost:4046/camera). Після цього ви зможете дивитись камери.
-
-## Відомі баги
-
--   Деколи, завдання дублються. (В таких випадках, ми робили завдання двічі)
--   На деяких телефонах Android приховування веб-переглядача призведе до його перезагрузки, що призведе до втрати ваших завдань. (можна спробувати вимкнути оптимізацію батареї браузера)
--   Саботаж реактору можна виправляти і з одного пристрою.
