@@ -108,5 +108,5 @@ Contributions are welcome! Follow these steps to contribute:
 4. Open a pull request.
 
 ## License
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE.txt).
 
