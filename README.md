@@ -19,7 +19,7 @@ To set up the project locally, follow these steps:
 
 2. **Clone the Repository**:
    ```bash
-   git clone (https://github.com/galuxosi/AmongUsRealLife.git)
+   git clone https://github.com/galuxosi/AmongUsRealLife.git
    cd AmongUsRealLife
    ```
 
