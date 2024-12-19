@@ -65,7 +65,6 @@ To set up the project locally, follow these steps:
 project_root
 ├── src                # Game logic
 ├── public             # Frontend assets
-├── config             # Configuration files
 ├── .gitignore         # Git ignore rules
 ├── package.json       # Node.js dependencies
 └── README.md          # Project overview
