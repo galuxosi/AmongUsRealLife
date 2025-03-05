@@ -39,7 +39,8 @@ const SOUNDS = {
 	incomplete: '/sounds/incomplete.ogg',
 	button: '/sounds/button.ogg',
 	accept: '/sounds/idaccepted.ogg',
-	powerdown: '/sounds/powerdown.mp3'
+	powerdown: '/sounds/powerdown.mp3',
+	callout: '/sounds/callout.ogg'
 };
 
 window.onload = function() {
@@ -58,93 +59,18 @@ emergencyMeeting$.addEventListener('click', () => {
 comms$.addEventListener('click', () => {
 	socket.emit('comms')
 	sabotageActive = true
-	comms$.style.display = 'none'
-	reactor$.style.display = 'none'
-	lights$.style.display = 'none'
-	oxygen$.style.display = 'none'
-	tasks$.style.display = 'none'
-	progressBar$.style.display = 'none'
-	progressLabel$.style.display = 'none'
-	emergencyMeeting$.style.display = 'none'
-	document.getElementById("tasksLabel").innerHTML = "Саботаж зв`язку";
-	document.getElementById("tasksLabel").style.color = "#ff0000";
-	setTimeout(function() {
-		comms$.style.display = 'inline'
-		reactor$.style.display = 'inline'
-		lights$.style.display = 'inline'
-		oxygen$.style.display = 'inline'
-	}, 60000);
-	setTimeout(function(){
-		document.getElementById("tasksLabel").innerHTML = "Завдання";
-		document.getElementById("tasksLabel").style.color = "#000000";
-		progressBar$.style.display = 'inline'
-		tasks$.style.display = 'inline'
-		progressLabel$.style.display = 'block'
-		emergencyMeeting$.style.display = 'inline'
-		sabotageActive = false
-	}, 26000);
-	
 })
 
 reactor$.addEventListener('click', () => {
 	socket.emit('reactor')
-	comms$.style.display = 'none'
-	reactor$.style.display = 'none'
-	lights$.style.display = 'none'
-	oxygen$.style.display = 'none'
-	setTimeout(function() {
-		comms$.style.display = 'inline'
-		reactor$.style.display = 'inline'
-		lights$.style.display = 'inline'
-		oxygen$.style.display = 'inline'
-	}, 60000);
 });
 
 oxygen$.addEventListener('click', () => {
 	socket.emit('oxygen')
-	comms$.style.display = 'none'
-	reactor$.style.display = 'none'
-	lights$.style.display = 'none'
-	oxygen$.style.display = 'none'
-	emergencyMeeting$.style.display = 'none'
-	sabotageActive = true
-	document.getElementById("tasksLabel").innerHTML = "Саботаж кисню " + timeLeft;
-	document.getElementById("tasksLabel").style.color = "#ff0000";
-	setTimeout(function() {
-		comms$.style.display = 'inline'
-		reactor$.style.display = 'inline'
-		lights$.style.display = 'inline'
-		oxygen$.style.display = 'inline'
-		emergencyMeeting$.style.display = 'inline'
-	}, 60000);
 });
 
 lights$.addEventListener('click', () => {
 	socket.emit('lights')
-	comms$.style.display = 'none'
-	reactor$.style.display = 'none'
-	lights$.style.display = 'none'
-	oxygen$.style.display = 'none'
-	emergencyMeeting$.style.display = 'none'
-	report$.style.display = 'none'
-	document.getElementById("tasksLabel").innerHTML = "Саботаж світла";
-	document.getElementById("tasksLabel").style.color = "#ff0000";
-	playSound(SOUNDS.powerdown)
-	setTimeout(function() {
-		comms$.style.display = 'inline'
-		reactor$.style.display = 'inline'
-		lights$.style.display = 'inline'
-		oxygen$.style.display = 'inline'
-	}, 60000);
-	setTimeout(function(){
-		document.getElementById("tasksLabel").innerHTML = "Завдання";
-		document.getElementById("tasksLabel").style.color = "#000000";
-		progressBar$.style.display = 'inline'
-		tasks$.style.display = 'inline'
-		progressLabel$.style.display = 'block'
-		emergencyMeeting$.style.display = 'inline'
-		report$.style.display = 'inline'
-	}, 20000);
 })
 
 socket.on('tasks', tasks => {
@@ -236,17 +162,6 @@ socket.on('play-meeting', async () => {
 	 	window.currentOxygenCountdown = null;
 	}
 
-	timeLeft = 30; 
-	document.getElementById("tasksLabel").innerHTML = "Завдання";
-	document.getElementById("tasksLabel").style.color = "#000000";
-	emergencyMeeting$.style.display = 'inline';
-
-	clearTimeout(timeOutOxygen);
-	emergencyMeeting$.style.display = 'inline';
-	if (window.currentOxygenCountdown) {
-		clearInterval(window.currentOxygenCountdown);
-		window.currentOxygenCountdown = null;
-	}
 	timeLeft = 30; 
 	document.getElementById("tasksLabel").innerHTML = "Завдання";
 	document.getElementById("tasksLabel").style.color = "#000000";
@@ -416,28 +331,30 @@ socket.on('do-lights', async () => {
 	reactor$.style.display = 'none'
 	lights$.style.display = 'none'
 	oxygen$.style.display = 'none'
-	emergencyMeeting$.style.display = 'none'
+	tasks$.style.display = 'none'
 	report$.style.display = 'none'
-	document.getElementById("tasksLabel").innerHTML = "Саботаж світла";
+	emergencyMeeting$.style.display = 'none'
+	document.getElementById("tasksLabel").innerHTML = "Саботаж cвітла";
 	document.getElementById("tasksLabel").style.color = "#ff0000";
-	await playSound(SOUNDS.powerdown)
-	await setTimeout(function() {
+	playSound(SOUNDS.powerdown);
+	setTimeout(function() {
 		comms$.style.display = 'inline'
 		reactor$.style.display = 'inline'
-		lights$.style.display = 'inline'
 		oxygen$.style.display = 'inline'
+		lights$.style.display = 'inline'
 	}, 60000);
-	await setTimeout(function(){
+	setTimeout(function(){
 		document.getElementById("tasksLabel").innerHTML = "Завдання";
 		document.getElementById("tasksLabel").style.color = "#000000";
-		progressBar$.style.display = 'inline'
-		tasks$.style.display = 'inline'
-		progressLabel$.style.display = 'block'
-		emergencyMeeting$.style.display = 'inline'
+		tasks$.style.display = 'block'
 		report$.style.display = 'inline'
-	}, 20000);
+		emergencyMeeting$.style.display = 'inline'
+	}, 26000);
 });
 
+socket.on('do-callout', async () => {
+	await playSound(SOUNDS.callout)
+});
 enableSound$.addEventListener('click', async () => {
 	console.log('enable sound');
 	enableSound$.style.display = 'none';

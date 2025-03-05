@@ -1,0 +1,90 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+/* Container for keypad and display */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+/* Keypad styling */
+#keypad {
+    background-color: #1c1c1c;
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 10px; /* Space between keypad and display */
+}
+button {
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 5px;
+    font-size: 20px;
+    color: white;
+    background-color: #666;
+}
+button:active {
+    background-color: #555;
+}
+/* Green and red button styling */
+.green {
+    background-color: #4CAF50;
+}
+.red {
+    background-color: #F44336;
+}
+/* Output display styling */
+#output {
+    width: 200px; /* Adjusted width for layout */
+    height: 60px; /* Match button height for alignment */
+    background-color: #666;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    text-align: center;
+    font-size: 20px;
+}
+
+#random {
+    width: 100px;
+    border: none;
+    border-radius: 5px;
+    color: black;
+    text-align: center;
+    font-size: 20px;
+    background-color: #ffff88;
+}
+
+#stickyNote {
+    position: relative;
+    right: 35%;
+    background-color: #ffff88;
+    padding: 10px;
+    transform: rotate(5deg);
+    box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+    width: 200px;
+    height: 200px;
+}
+
+#getCode {
+    position: absolute;
+    bottom: 5%;
+    left: 5%;
+    width: 90%;
+    color: black;
+    font-weight: bold;
+    background-color: #a2a256;
+}

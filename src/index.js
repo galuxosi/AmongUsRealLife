@@ -189,12 +189,20 @@ io.on('connection', socket => {
 		}
 	});
 
+	socket.on('callout', () => {
+		io.emit('do-callout');
+	});
+
 	socket.on('oxygen', () => {
 		io.emit('do-oxygen');
 	});
 	
 	socket.on('lights', () => {
 		io.emit('do-lights');
+	});
+
+	socket.on('lights-fixed', () => {
+		io.emit('do-lights-fixed');
 	});
 
 	socket.on('oxygenHasBeenFixed', () => {

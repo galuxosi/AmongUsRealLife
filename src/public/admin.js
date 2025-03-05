@@ -5,9 +5,14 @@ const socket = io({
 });
 
 const startGame$ = document.querySelector('#start-game');
+const callOut$ = document.querySelector('#callOut');
 
 startGame$.addEventListener('click', () => {
 	socket.emit('start-game');
+});
+
+callOut$.addEventListener('click', () => {
+	socket.emit('callout');
 });
 
 /**

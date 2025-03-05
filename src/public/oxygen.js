@@ -29,7 +29,7 @@ function generateRandomNumber() {
 	randomCode = Math.floor(10000 + Math.random() * 90000);
 	randomCodeOutput = randomCode.toString();
 	document.getElementById('random').value = randomCodeOutput
-	}
+}
 
 function addNumber(number) {
 	if (code.length < 5) {
@@ -52,8 +52,15 @@ function submitCode() {
         playSound(SOUNDS.failed)
     }
     randomCode = ''
+	window.setTimeout(function(){
+        window.location = "/404.html";
+    }, 1000);
 }
 
+function getCode() {
+	document.getElementById('getCode').style.display = "none";
+	generateRandomNumber()
+}
 
 async function wait(milliseconds) {
 	await new Promise(resolve => {
