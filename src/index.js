@@ -38,6 +38,10 @@ app.get('/camera', (req, res) => {
 	res.sendFile(path.join(__dirname, 'views', 'camera.html'));
 });
 
+app.get('/comms', (req, res) => {
+	res.sendFile(path.join(__dirname, 'views', 'comms.html'));
+});
+
 app.use('/', express.static(path.join(__dirname, 'public')));
 
 io.on('connection', socket => {
@@ -176,6 +180,11 @@ io.on('connection', socket => {
 	socket.on('comms', () => {
 		io.emit('do-comms');
 	});
+
+	socket.on('comms-fixed', () => {
+		io.emit('do-comms-fixed');
+	});
+
 	socket.on('reactor', () => {
 		io.emit('do-reactor');
 	});

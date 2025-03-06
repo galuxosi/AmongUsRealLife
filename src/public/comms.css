@@ -1,0 +1,48 @@
+#keypad {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* Creates five columns */
+    gap: 5px; /* Adjust space between buttons as needed */
+    width: 270px; /* Adjust width as needed */
+    margin: auto;
+}
+.number {
+    width: 50px; /* Adjust width as needed */
+    height: 50px; /* Adjust height as needed */
+    background-color: blue;
+    color: white;
+    font-size: 20px; /* Adjust font size as needed */
+    border: none;
+    cursor: pointer;
+}
+.number.correct {
+    background-color: green;
+}
+.number.wrong {
+    background-color: red;
+}
+body {
+    background-color: #333; /* Darker gray background */
+}
+#keypad {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* Creates five columns */
+    gap: 5px; /* Reduced space between buttons */
+    padding: 20px; /* Padding around the keypad */
+    justify-content: center;
+    margin: auto;
+}
+.number {
+    width: 60px; /* Adjusted button size */
+    height: 60px; /* Adjusted button size */
+    background-color: blue;
+    color: white;
+    font-size: 24px; /* Adjust font size as needed */
+    border: 2px solid gray; /* Gray frame around buttons */
+    cursor: pointer;
+}
+.number.correct {
+    background-color: green;
+}
+.number.wrong {
+    background-color: red;
+}

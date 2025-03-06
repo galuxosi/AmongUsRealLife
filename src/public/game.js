@@ -31,7 +31,7 @@ const SOUNDS = {
 	voteResult: '/sounds/vote-result.mp3',
 	youLose: '/sounds/you-lose.mp3',
 	youWin: '/sounds/you-win.mp3',
-	comms: '/sounds/comms.mp3',
+	comms: '/sounds/comms.ogg',
 	reactor: '/sounds/reactor_meltdown.mp3',
 	join: '/sounds/join.mp3',
 	leave: '/sounds/leave.mp3',
@@ -192,19 +192,21 @@ socket.on('do-comms', async () => {
 	document.getElementById("tasksLabel").innerHTML = "Саботаж зв`язку";
 	document.getElementById("tasksLabel").style.color = "#ff0000";
 	playSound(SOUNDS.comms);
-	setTimeout(function() {
-		comms$.disabled = false;   
-		reactor$.disabled = false;   
-		oxygen$.disabled = false;   
-		lights$.disabled = false;   
-	}, 60000);
-	setTimeout(function(){
-		document.getElementById("tasksLabel").innerHTML = "Завдання";
-		document.getElementById("tasksLabel").style.color = "#000000";
-		tasks$.style.display = 'block'
-		progressLabel$.style.display = 'block'
-		emergencyMeeting$.disabled = false;   
-	}, 26000);
+});
+
+socket.on('do-comms-fixed', async () => {
+	setTimeout(() => {
+	comms$.disabled = false;   
+	reactor$.disabled = false;   
+	oxygen$.disabled = false;   
+	lights$.disabled = false;
+	}, 30000);   
+	document.getElementById("tasksLabel").innerHTML = "Завдання";
+	document.getElementById("tasksLabel").style.color = "#000000";
+	tasks$.style.display = 'block'
+	progressLabel$.style.display = 'block'
+	emergencyMeeting$.disabled = false;   
+	stopSound();
 });
 
 socket.on('do-reactorFixedFully', async () => {
@@ -251,7 +253,7 @@ socket.on('do-reactor', async () => {
 		reactor$.disabled = false;   
 		lights$.disabled = false;   
 		oxygen$.disabled = false;  
-	}, 60000);
+	}, 30000);
 
 	const countdownInterval = setInterval(() => {
 	timeLeft -= 1;
@@ -301,7 +303,7 @@ socket.on('do-oxygen', async () => {
 		reactor$.disabled = false;   
 		lights$.disabled = false;   
 		oxygen$.disabled = false;  
-	}, 60000);
+	}, 30000);
 
 	const countdownInterval = setInterval(() => {
 		timeLeft -= 1;
@@ -346,7 +348,7 @@ socket.on('do-lights', async () => {
 		reactor$.disabled = false;   
 		lights$.disabled = false;   
 		oxygen$.disabled = false;  
-	}, 60000);
+	}, 56000);
 	setTimeout(function(){
 		document.getElementById("tasksLabel").innerHTML = "Завдання";
 		document.getElementById("tasksLabel").style.color = "#000000";

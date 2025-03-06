@@ -41,7 +41,6 @@ function addNumber(number) {
 function clearOutput() {
 	code = '';
 	document.getElementById('output').value = code;
-	playFail();
 }
 
 function submitCode() {
@@ -49,13 +48,13 @@ function submitCode() {
         socket.emit('oxygenHasBeenFixed')
         clearOutput()
 		playSound(SOUNDS.accept)
+		window.setTimeout(function(){
+			window.location = "https://google.com";
+		}, 500);
     } else {
         playSound(SOUNDS.failed)
     }
     randomCode = ''
-	window.setTimeout(function(){
-        window.location = "/404.html";
-    }, 1000);
 }
 
 function getCode() {
