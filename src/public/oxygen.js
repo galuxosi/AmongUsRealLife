@@ -48,6 +48,7 @@ function submitCode() {
     if (code.toString() === randomCodeOutput) {
         socket.emit('oxygenHasBeenFixed')
         clearOutput()
+		playSound(SOUNDS.accept)
     } else {
         playSound(SOUNDS.failed)
     }
@@ -67,9 +68,7 @@ async function wait(milliseconds) {
 		setTimeout(() => resolve(), milliseconds);
 	});
 }
-// JavaScript functions to handle button clicks
-
-
+ 
 async function playSound(url) {
 	soundPlayer.src = url;
 	await soundPlayer.play();

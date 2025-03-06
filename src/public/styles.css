@@ -14,16 +14,40 @@ button {
 	border-radius: 1rem;
 }
 
-
 img {
 	width: 100%;
 }
 
 #enable-sound {
 	display: inline;
+	margin-bottom: 0.10rem;
 }
 
 #sabotageButtons {
-	max-width: 20rem;
-	display: flex;
+	display: inline-flex;
+	margin-top: 0.15rem;
+	width: 20.2rem;
+	gap: 0.25rem;
+	
+}
+
+#comms {
+	background-color: #e72f2f;
+	border-color: #5a2f2f;
+}
+
+#lights {
+	margin-right: 0.rem;
+	background-color: #e72f2f;
+	border-color: #5a2f2f;
+}
+
+#oxygen {
+	background-color: #e72f2f;
+	border-color: #5a2f2f;
+}
+
+#reactor {
+	background-color: #e72f2f;
+	border-color: #5a2f2f;
 }

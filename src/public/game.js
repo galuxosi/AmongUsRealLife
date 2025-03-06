@@ -24,7 +24,7 @@ let timeOutOxygen;
 
 const soundPlayer = new Audio();
 const SOUNDS = {
-	meeting: '/sounds/meeting.mp3',
+	meeting: '/sounds/meeting.ogg',
 	sabotage: '/sounds/sabotage.mp3',
 	start: '/sounds/start.mp3',
 	sussyBoy: '/sounds/sussy-boy.mp3',
@@ -53,7 +53,7 @@ report$.addEventListener('click', () => {
 
 emergencyMeeting$.addEventListener('click', () => {
 	socket.emit('emergency-meeting');
-	emergencyMeeting$.style.display = 'none';
+	emergencyMeeting$.disabled = true;
 });
 
 comms$.addEventListener('click', () => {
@@ -72,6 +72,11 @@ oxygen$.addEventListener('click', () => {
 lights$.addEventListener('click', () => {
 	socket.emit('lights')
 })
+
+socket.on('do-callout', async () => {
+	await playSound(SOUNDS.callout)
+});
+
 
 socket.on('tasks', tasks => {
 	// Remove existing tasks
@@ -156,16 +161,16 @@ socket.on('play-meeting', async () => {
 	await playSound(SOUNDS.sussyBoy);
 
 	await clearTimeout(timeOutOxygen);
-	emergencyMeeting$.style.display = 'inline';
 	if (window.currentOxygenCountdown) {
 		await clearInterval(window.currentOxygenCountdown);
 	 	window.currentOxygenCountdown = null;
+		emergencyMeeting$.disabled = false;	
+		document.getElementById("tasksLabel").innerHTML = "Завдання";
+		document.getElementById("tasksLabel").style.color = "#000000";
 	}
 
 	timeLeft = 30; 
-	document.getElementById("tasksLabel").innerHTML = "Завдання";
-	document.getElementById("tasksLabel").style.color = "#000000";
-	emergencyMeeting$.style.display = 'inline';
+
 });
 
 socket.on('play-win', async () => {
@@ -177,28 +182,28 @@ socket.on('play-disconnect', async () => {
 });
 
 socket.on('do-comms', async () => {
-	comms$.style.display = 'none'
-	reactor$.style.display = 'none'
-	lights$.style.display = 'none'
-	oxygen$.style.display = 'none'
-	tasks$.style.display = 'none'
-	progressLabel$.style.display = 'none'
-	emergencyMeeting$.style.display = 'none'
+	comms$.disabled = true;   
+	reactor$.disabled = true;   
+	lights$.disabled = true;   
+	oxygen$.disabled = true;
+	tasks$.style.display = 'none';   
+	progressLabel$.style.display = 'none';
+	emergencyMeeting$.disabled = true;
 	document.getElementById("tasksLabel").innerHTML = "Саботаж зв`язку";
 	document.getElementById("tasksLabel").style.color = "#ff0000";
 	playSound(SOUNDS.comms);
 	setTimeout(function() {
-		comms$.style.display = 'inline'
-		reactor$.style.display = 'inline'
-		oxygen$.style.display = 'inline'
-		lights$.style.display = 'inline'
+		comms$.disabled = false;   
+		reactor$.disabled = false;   
+		oxygen$.disabled = false;   
+		lights$.disabled = false;   
 	}, 60000);
 	setTimeout(function(){
 		document.getElementById("tasksLabel").innerHTML = "Завдання";
 		document.getElementById("tasksLabel").style.color = "#000000";
 		tasks$.style.display = 'block'
 		progressLabel$.style.display = 'block'
-		emergencyMeeting$.style.display = 'inline'
+		emergencyMeeting$.disabled = false;   
 	}, 26000);
 });
 
@@ -213,26 +218,25 @@ socket.on('do-reactorFixedFully', async () => {
 	timeLeft = 30; 
 	document.getElementById("tasksLabel").innerHTML = "Завдання";
 	document.getElementById("tasksLabel").style.color = "#000000";
-	emergencyMeeting$.style.display = 'inline';
 });
 
 socket.on('do-reactor', async () => {
 	timeLeft = 30; 
 	await playSound(SOUNDS.reactor);
-	comms$.style.display = 'none';
-	reactor$.style.display = 'none';
-	lights$.style.display = 'none';
-	oxygen$.style.display = 'none';
-	emergencyMeeting$.style.display = 'none';
+	comms$.disabled = true;   
+	reactor$.disabled = true;   
+	lights$.disabled = true;   
+	oxygen$.disabled = true;   
+	emergencyMeeting$.disabled = true;
 	document.getElementById("tasksLabel").innerHTML = "Саботаж реактору " + timeLeft;
 	document.getElementById("tasksLabel").style.color = "#ff0000";
 	timeOutOxygen = setTimeout(() => {
 		playSound(SOUNDS.youLose);
-		comms$.style.display = 'inline';
-		reactor$.style.display = 'inline';
-		lights$.style.display = 'inline';
-		oxygen$.style.display = 'inline';
-		emergencyMeeting$.style.display = 'inline';
+		comms$.disabled = false;   
+		reactor$.disabled = false;   
+		lights$.disabled = false;   
+		oxygen$.disabled = false;   
+		emergencyMeeting$.disabled = false;
 		timeLeft = 30;
 		document.getElementById("tasksLabel").innerHTML = "Завдання";
 		document.getElementById("tasksLabel").style.color = "#000000";
@@ -243,10 +247,10 @@ socket.on('do-reactor', async () => {
 	}, 30000);
 
 	await setTimeout(() => {
-		comms$.style.display = 'inline';
-		reactor$.style.display = 'inline';
-		oxygen$.style.display = 'inline';
-		lights$.style.display = 'inline';
+		comms$.disabled = false;   
+		reactor$.disabled = false;   
+		lights$.disabled = false;   
+		oxygen$.disabled = false;  
 	}, 60000);
 
 	const countdownInterval = setInterval(() => {
@@ -267,10 +271,10 @@ socket.on('do-oxygen', async () => {
 
 	await playSound(SOUNDS.reactor);
 
-	comms$.style.display = 'none';
-	reactor$.style.display = 'none';
-	lights$.style.display = 'none';
-	oxygen$.style.display = 'none';
+	comms$.disabled = true; 
+	reactor$.disabled = true;   
+	lights$.disabled = true;  
+	oxygen$.disabled = true; 
 	emergencyMeeting$.style.display = 'none';
 
 	document.getElementById("tasksLabel").innerHTML = "Саботаж кисню " + timeLeft;
@@ -278,10 +282,10 @@ socket.on('do-oxygen', async () => {
 
 	timeOutOxygen = setTimeout(() => {
 		playSound(SOUNDS.youLose);
-		comms$.style.display = 'inline';
-		reactor$.style.display = 'inline';
-		lights$.style.display = 'inline';
-		oxygen$.style.display = 'inline';
+		comms$.disabled = false;   
+		reactor$.disabled = false;   
+		lights$.disabled = false;   
+		oxygen$.disabled = false;  
 		emergencyMeeting$.style.display = 'inline';
 		timeLeft = 30;
 		document.getElementById("tasksLabel").innerHTML = "Завдання";
@@ -293,10 +297,10 @@ socket.on('do-oxygen', async () => {
 	}, 30000);
 
 	await setTimeout(() => {
-		comms$.style.display = 'inline';
-		reactor$.style.display = 'inline';
-		oxygen$.style.display = 'inline';
-		lights$.style.display = 'inline';
+		comms$.disabled = false;   
+		reactor$.disabled = false;   
+		lights$.disabled = false;   
+		oxygen$.disabled = false;  
 	}, 60000);
 
 	const countdownInterval = setInterval(() => {
@@ -327,21 +331,21 @@ socket.on('do-oxygenHasBeenFixed', async () => {
 });
 
 socket.on('do-lights', async () => {
-	comms$.style.display = 'none'
-	reactor$.style.display = 'none'
-	lights$.style.display = 'none'
-	oxygen$.style.display = 'none'
+	comms$.disabled = true; 
+	reactor$.disabled = true;   
+	lights$.disabled = true;  
+	oxygen$.disabled = true; 
 	tasks$.style.display = 'none'
 	report$.style.display = 'none'
 	emergencyMeeting$.style.display = 'none'
-	document.getElementById("tasksLabel").innerHTML = "Саботаж cвітла";
+	document.getElementById("tasksLabel").innerHTML = "Саботаж світла";
 	document.getElementById("tasksLabel").style.color = "#ff0000";
 	playSound(SOUNDS.powerdown);
 	setTimeout(function() {
-		comms$.style.display = 'inline'
-		reactor$.style.display = 'inline'
-		oxygen$.style.display = 'inline'
-		lights$.style.display = 'inline'
+		comms$.disabled = false;   
+		reactor$.disabled = false;   
+		lights$.disabled = false;   
+		oxygen$.disabled = false;  
 	}, 60000);
 	setTimeout(function(){
 		document.getElementById("tasksLabel").innerHTML = "Завдання";
@@ -352,9 +356,8 @@ socket.on('do-lights', async () => {
 	}, 26000);
 });
 
-socket.on('do-callout', async () => {
-	await playSound(SOUNDS.callout)
-});
+
+
 enableSound$.addEventListener('click', async () => {
 	console.log('enable sound');
 	enableSound$.style.display = 'none';
@@ -371,5 +374,3 @@ async function stopSound(url) {
 	await soundPlayer.pause();
 	soundPlayer.currentTime = 0;
 }
-
-// ПАСХАЛКО 1488 Что-то жарко стало включаем вентиляторі
