@@ -112,10 +112,10 @@ socket.on('tasks', tasks => {
 
 socket.on('role', role => {
     hideRole();
-    let isRoleHidden = false;
+    let isRoleHidden = true;
     const role$ = document.createElement('a');
     role$.classList.add('role');
-    role$.textContent = `Ви ${role}. Натисніть щоби приховати`;
+    role$.textContent = `Натисніть щоби показати роль`;
     role$.onclick = () => {
         if (!isRoleHidden) {
             role$.textContent = 'Натисніть щоби показати роль';
@@ -175,6 +175,7 @@ socket.on('play-meeting', async () => {
 
 socket.on('play-win', async () => {
 	await playSound(SOUNDS.youWin);
+	window.alert("Гра завершена. Члени екіпажу виконали всі завдання.")
 });
 
 socket.on('play-disconnect', async () => {
@@ -182,6 +183,7 @@ socket.on('play-disconnect', async () => {
 });
 
 socket.on('do-comms', async () => {
+	await playSound(SOUNDS.comms);
 	comms$.disabled = true;   
 	reactor$.disabled = true;   
 	lights$.disabled = true;   
@@ -191,7 +193,6 @@ socket.on('do-comms', async () => {
 	emergencyMeeting$.disabled = true;
 	document.getElementById("tasksLabel").innerHTML = "Саботаж зв`язку";
 	document.getElementById("tasksLabel").style.color = "#ff0000";
-	playSound(SOUNDS.comms);
 });
 
 socket.on('do-comms-fixed', async () => {
@@ -246,6 +247,7 @@ socket.on('do-reactor', async () => {
 			clearInterval(window.currentOxygenCountdown);
 			window.currentOxygenCountdown = null;
 		}
+		window.alert("Гра закінчена. Предателі перемогли саботажем реактору.")
 	}, 30000);
 
 	await setTimeout(() => {
@@ -292,6 +294,7 @@ socket.on('do-oxygen', async () => {
 		timeLeft = 30;
 		document.getElementById("tasksLabel").innerHTML = "Завдання";
 		document.getElementById("tasksLabel").style.color = "#000000";
+		window.alert("Гра завершена. Предателі перемогли саботажем кисню.")
 		if (window.currentOxygenCountdown) {
 			clearInterval(window.currentOxygenCountdown);
 			window.currentOxygenCountdown = null;
@@ -333,16 +336,16 @@ socket.on('do-oxygenHasBeenFixed', async () => {
 });
 
 socket.on('do-lights', async () => {
+	playSound(SOUNDS.powerdown);
 	comms$.disabled = true; 
 	reactor$.disabled = true;   
 	lights$.disabled = true;  
 	oxygen$.disabled = true; 
-	tasks$.style.display = 'none'
-	report$.style.display = 'none'
-	emergencyMeeting$.style.display = 'none'
+	report$.disabled = true;
+	emergencyMeeting$.disabled = true;
+	tasks$.style.display = 'none';
 	document.getElementById("tasksLabel").innerHTML = "Саботаж світла";
 	document.getElementById("tasksLabel").style.color = "#ff0000";
-	playSound(SOUNDS.powerdown);
 	setTimeout(function() {
 		comms$.disabled = false;   
 		reactor$.disabled = false;   
@@ -353,12 +356,10 @@ socket.on('do-lights', async () => {
 		document.getElementById("tasksLabel").innerHTML = "Завдання";
 		document.getElementById("tasksLabel").style.color = "#000000";
 		tasks$.style.display = 'block'
-		report$.style.display = 'inline'
-		emergencyMeeting$.style.display = 'inline'
+		emergencyMeeting$.disabled = false;
+		report$.disabled = false;
 	}, 26000);
 });
-
-
 
 enableSound$.addEventListener('click', async () => {
 	console.log('enable sound');
