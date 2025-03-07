@@ -346,19 +346,21 @@ socket.on('do-lights', async () => {
 	tasks$.style.display = 'none';
 	document.getElementById("tasksLabel").innerHTML = "Саботаж світла";
 	document.getElementById("tasksLabel").style.color = "#ff0000";
+});
+
+socket.on('do-lights-fixed', async () => {
+	stopSound();
+	document.getElementById("tasksLabel").innerHTML = "Завдання";
+	document.getElementById("tasksLabel").style.color = "#000000";
+	tasks$.style.display = 'block';
+	emergencyMeeting$.disabled = false;
+	report$.disabled = false;
 	setTimeout(function() {
 		comms$.disabled = false;   
 		reactor$.disabled = false;   
 		lights$.disabled = false;   
 		oxygen$.disabled = false;  
-	}, 56000);
-	setTimeout(function(){
-		document.getElementById("tasksLabel").innerHTML = "Завдання";
-		document.getElementById("tasksLabel").style.color = "#000000";
-		tasks$.style.display = 'block'
-		emergencyMeeting$.disabled = false;
-		report$.disabled = false;
-	}, 26000);
+	}, 30000);
 });
 
 enableSound$.addEventListener('click', async () => {

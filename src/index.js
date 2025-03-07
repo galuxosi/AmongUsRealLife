@@ -42,6 +42,10 @@ app.get('/comms', (req, res) => {
 	res.sendFile(path.join(__dirname, 'views', 'comms.html'));
 });
 
+app.get('/lights', (req, res) => {
+	res.sendFile(path.join(__dirname, 'views', 'lights.html'));
+});
+
 app.use('/', express.static(path.join(__dirname, 'public')));
 
 io.on('connection', socket => {
@@ -185,27 +189,6 @@ io.on('connection', socket => {
 		io.emit('do-comms-fixed');
 	});
 
-	socket.on('reactor', () => {
-		io.emit('do-reactor');
-	});
-
-	socket.on('reactorFixed', () => {
-		io.emit('do-reactorFixed');
-		reactorProgress += 1
-		if (reactorProgress == 2) { 
-			io.emit('do-reactorFixedFully') 
-			reactorProgress = 0 
-		}
-	});
-
-	socket.on('callout', () => {
-		io.emit('do-callout');
-	});
-
-	socket.on('oxygen', () => {
-		io.emit('do-oxygen');
-	});
-	
 	socket.on('lights', () => {
 		io.emit('do-lights');
 	});
@@ -214,8 +197,24 @@ io.on('connection', socket => {
 		io.emit('do-lights-fixed');
 	});
 
+	socket.on('oxygen', () => {
+		io.emit('do-oxygen');
+	});
+
 	socket.on('oxygenHasBeenFixed', () => {
 		io.emit('do-oxygenHasBeenFixed');
+	});
+	
+	socket.on('reactor', () => {
+		io.emit('do-reactor');
+	});
+
+	socket.on('reactorFixed', () => {
+		io.emit('do-reactorFixedFully') 
+	});
+
+	socket.on('callout', () => {
+		io.emit('do-callout');
 	});
 
 	socket.on('task-complete', taskId => {
