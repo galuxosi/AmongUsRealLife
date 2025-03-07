@@ -284,7 +284,7 @@ socket.on('do-reactor', async () => {
 socket.on('do-reactorFixedFully', async () => {
 	stopSound();
 	clearTimeout(timeOutOxygen);
-	emergencyMeeting$.style.display = 'inline';
+	emergencyMeeting$.disabled = 'false';
 	if (window.currentOxygenCountdown) {
 		clearInterval(window.currentOxygenCountdown);
 		window.currentOxygenCountdown = null;
@@ -296,25 +296,21 @@ socket.on('do-reactorFixedFully', async () => {
 
 socket.on('do-oxygen', async () => {
 	timeLeft = 30; 
-
 	await playSound(SOUNDS.reactor);
-
 	comms$.disabled = true; 
 	reactor$.disabled = true;   
 	lights$.disabled = true;  
 	oxygen$.disabled = true; 
-	emergencyMeeting$.style.display = 'none';
-
+	emergencyMeeting$.disabled = true;
 	tasksLabel$.innerHTML = "Саботаж кисню " + timeLeft;
 	tasksLabel$.style.color = "#ff0000";
-
 	timeOutOxygen = setTimeout(() => {
 		playSound(SOUNDS.youLose);
 		comms$.disabled = false;   
 		reactor$.disabled = false;   
 		lights$.disabled = false;   
 		oxygen$.disabled = false;  
-		emergencyMeeting$.style.display = 'inline';
+		emergencyMeeting$.disabled = false;
 		timeLeft = 30;
 		tasksLabel$.innerHTML = "Завдання";
 		tasksLabel$.style.color = "#000000";
@@ -346,7 +342,7 @@ socket.on('do-oxygen', async () => {
 socket.on('do-oxygenHasBeenFixed', async () => {
 	stopSound();
 	clearTimeout(timeOutOxygen);
-	emergencyMeeting$.style.display = 'inline';
+	emergencyMeeting$.disabled = false;
 
 	if (window.currentOxygenCountdown) {
 		clearInterval(window.currentOxygenCountdown);
@@ -356,7 +352,7 @@ socket.on('do-oxygenHasBeenFixed', async () => {
 	timeLeft = 30; 
 	tasksLabel$.innerHTML = "Завдання";
 	tasksLabel$.style.color = "#000000";
-	emergencyMeeting$.style.display = 'inline';
+	emergencyMeeting$.disabled = false;
 });
 
 
