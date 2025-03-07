@@ -4,8 +4,6 @@ const socket = io({
 	}
 });
 
-var sabotageActive = false
-
 const emergencyMeeting$ = document.querySelector('#emergency-meeting');
 const enableSound$ = document.querySelector('#enable-sound');
 const progress$ = document.querySelector('#progress');
@@ -19,6 +17,7 @@ const comms$ = document.querySelector('#comms');
 const reactor$ = document.querySelector('#reactor');
 const lights$ = document.querySelector("#lights")
 
+let sabotageActive = false
 let countdownInterval;
 let timeOutOxygen;
 
@@ -131,9 +130,7 @@ socket.on('role', role => {
 });
 
 function hideRole() {
-	document
-		.querySelectorAll('.role')
-		.forEach(element => (element.style.display = 'none'));
+	document.querySelectorAll('.role').forEach(element => (element.style.display = 'none'));
 }
 
 socket.on('progress', progress => {
@@ -159,14 +156,13 @@ socket.on('play-meeting', async () => {
 	await playSound(SOUNDS.meeting);
 	await wait(2000);
 	await playSound(SOUNDS.sussyBoy);
-
 	await clearTimeout(timeOutOxygen);
 	if (window.currentOxygenCountdown) {
 		await clearInterval(window.currentOxygenCountdown);
 	 	window.currentOxygenCountdown = null;
 		emergencyMeeting$.disabled = false;	
-		document.getElementById("tasksLabel").innerHTML = "Завдання";
-		document.getElementById("tasksLabel").style.color = "#000000";
+		tasksLabel$.innerHTML = "Завдання";
+		tasksLabel$.style.color = "#000000";
 	}
 
 	timeLeft = 30; 
@@ -191,36 +187,51 @@ socket.on('do-comms', async () => {
 	tasks$.style.display = 'none';   
 	progressLabel$.style.display = 'none';
 	emergencyMeeting$.disabled = true;
-	document.getElementById("tasksLabel").innerHTML = "Саботаж зв`язку";
-	document.getElementById("tasksLabel").style.color = "#ff0000";
+	tasksLabel$.innerHTML = "Саботаж зв`язку";
+	tasksLabel$.style.color = "#ff0000";
 });
 
 socket.on('do-comms-fixed', async () => {
 	setTimeout(() => {
-	comms$.disabled = false;   
-	reactor$.disabled = false;   
-	oxygen$.disabled = false;   
-	lights$.disabled = false;
+		comms$.disabled = false;   
+		reactor$.disabled = false;   
+		oxygen$.disabled = false;   
+		lights$.disabled = false;
 	}, 30000);   
-	document.getElementById("tasksLabel").innerHTML = "Завдання";
-	document.getElementById("tasksLabel").style.color = "#000000";
+	tasksLabel$.innerHTML = "Завдання";
+	tasksLabel$.style.color = "#000000";
 	tasks$.style.display = 'block'
 	progressLabel$.style.display = 'block'
 	emergencyMeeting$.disabled = false;   
 	stopSound();
 });
 
-socket.on('do-reactorFixedFully', async () => {
+socket.on('do-lights', async () => {
+	playSound(SOUNDS.powerdown);
+	comms$.disabled = true; 
+	reactor$.disabled = true;   
+	lights$.disabled = true;  
+	oxygen$.disabled = true; 
+	report$.disabled = true;
+	emergencyMeeting$.disabled = true;
+	tasks$.style.display = 'none';
+	tasksLabel$.innerHTML = "Саботаж світла";
+	tasksLabel$.style.color = "#ff0000";
+});
+
+socket.on('do-lights-fixed', async () => {
 	stopSound();
-	clearTimeout(timeOutOxygen);
-	emergencyMeeting$.style.display = 'inline';
-	if (window.currentOxygenCountdown) {
-		clearInterval(window.currentOxygenCountdown);
-		window.currentOxygenCountdown = null;
-	}
-	timeLeft = 30; 
-	document.getElementById("tasksLabel").innerHTML = "Завдання";
-	document.getElementById("tasksLabel").style.color = "#000000";
+	tasksLabel$.innerHTML = "Завдання";
+	tasksLabel$.style.color = "#000000";
+	tasks$.style.display = 'block';
+	emergencyMeeting$.disabled = false;
+	report$.disabled = false;
+	setTimeout(function() {
+		comms$.disabled = false;   
+		reactor$.disabled = false;   
+		lights$.disabled = false;   
+		oxygen$.disabled = false;  
+	}, 30000);
 });
 
 socket.on('do-reactor', async () => {
@@ -231,8 +242,8 @@ socket.on('do-reactor', async () => {
 	lights$.disabled = true;   
 	oxygen$.disabled = true;   
 	emergencyMeeting$.disabled = true;
-	document.getElementById("tasksLabel").innerHTML = "Саботаж реактору " + timeLeft;
-	document.getElementById("tasksLabel").style.color = "#ff0000";
+	tasksLabel$.innerHTML = "Саботаж реактору " + timeLeft;
+	tasksLabel$.style.color = "#ff0000";
 	timeOutOxygen = setTimeout(() => {
 		playSound(SOUNDS.youLose);
 		comms$.disabled = false;   
@@ -241,8 +252,8 @@ socket.on('do-reactor', async () => {
 		oxygen$.disabled = false;   
 		emergencyMeeting$.disabled = false;
 		timeLeft = 30;
-		document.getElementById("tasksLabel").innerHTML = "Завдання";
-		document.getElementById("tasksLabel").style.color = "#000000";
+		tasksLabel$.innerHTML = "Завдання";
+		tasksLabel$.style.color = "#000000";
 		if (window.currentOxygenCountdown) {
 			clearInterval(window.currentOxygenCountdown);
 			window.currentOxygenCountdown = null;
@@ -259,7 +270,7 @@ socket.on('do-reactor', async () => {
 
 	const countdownInterval = setInterval(() => {
 	timeLeft -= 1;
-	document.getElementById("tasksLabel").innerHTML = "Саботаж реактору " + timeLeft;
+	tasksLabel$.innerHTML = "Саботаж реактору " + timeLeft;
 
 	if (timeLeft <= 0) {
 		clearInterval(countdownInterval);
@@ -268,6 +279,19 @@ socket.on('do-reactor', async () => {
 	}, 1000);
 
 	window.currentOxygenCountdown = countdownInterval;
+});
+
+socket.on('do-reactorFixedFully', async () => {
+	stopSound();
+	clearTimeout(timeOutOxygen);
+	emergencyMeeting$.style.display = 'inline';
+	if (window.currentOxygenCountdown) {
+		clearInterval(window.currentOxygenCountdown);
+		window.currentOxygenCountdown = null;
+	}
+	timeLeft = 30; 
+	tasksLabel$.innerHTML = "Завдання";
+	tasksLabel$.style.color = "#000000";
 });
 
 socket.on('do-oxygen', async () => {
@@ -281,8 +305,8 @@ socket.on('do-oxygen', async () => {
 	oxygen$.disabled = true; 
 	emergencyMeeting$.style.display = 'none';
 
-	document.getElementById("tasksLabel").innerHTML = "Саботаж кисню " + timeLeft;
-	document.getElementById("tasksLabel").style.color = "#ff0000";
+	tasksLabel$.innerHTML = "Саботаж кисню " + timeLeft;
+	tasksLabel$.style.color = "#ff0000";
 
 	timeOutOxygen = setTimeout(() => {
 		playSound(SOUNDS.youLose);
@@ -292,8 +316,8 @@ socket.on('do-oxygen', async () => {
 		oxygen$.disabled = false;  
 		emergencyMeeting$.style.display = 'inline';
 		timeLeft = 30;
-		document.getElementById("tasksLabel").innerHTML = "Завдання";
-		document.getElementById("tasksLabel").style.color = "#000000";
+		tasksLabel$.innerHTML = "Завдання";
+		tasksLabel$.style.color = "#000000";
 		window.alert("Гра завершена. Предателі перемогли саботажем кисню.")
 		if (window.currentOxygenCountdown) {
 			clearInterval(window.currentOxygenCountdown);
@@ -310,7 +334,7 @@ socket.on('do-oxygen', async () => {
 
 	const countdownInterval = setInterval(() => {
 		timeLeft -= 1;
-		document.getElementById("tasksLabel").innerHTML = "Саботаж кисню " + timeLeft;
+		tasksLabel$.innerHTML = "Саботаж кисню " + timeLeft;
 
 		if (timeLeft <= 0) {
 			clearInterval(countdownInterval);
@@ -330,38 +354,11 @@ socket.on('do-oxygenHasBeenFixed', async () => {
 	}
 
 	timeLeft = 30; 
-	document.getElementById("tasksLabel").innerHTML = "Завдання";
-	document.getElementById("tasksLabel").style.color = "#000000";
+	tasksLabel$.innerHTML = "Завдання";
+	tasksLabel$.style.color = "#000000";
 	emergencyMeeting$.style.display = 'inline';
 });
 
-socket.on('do-lights', async () => {
-	playSound(SOUNDS.powerdown);
-	comms$.disabled = true; 
-	reactor$.disabled = true;   
-	lights$.disabled = true;  
-	oxygen$.disabled = true; 
-	report$.disabled = true;
-	emergencyMeeting$.disabled = true;
-	tasks$.style.display = 'none';
-	document.getElementById("tasksLabel").innerHTML = "Саботаж світла";
-	document.getElementById("tasksLabel").style.color = "#ff0000";
-});
-
-socket.on('do-lights-fixed', async () => {
-	stopSound();
-	document.getElementById("tasksLabel").innerHTML = "Завдання";
-	document.getElementById("tasksLabel").style.color = "#000000";
-	tasks$.style.display = 'block';
-	emergencyMeeting$.disabled = false;
-	report$.disabled = false;
-	setTimeout(function() {
-		comms$.disabled = false;   
-		reactor$.disabled = false;   
-		lights$.disabled = false;   
-		oxygen$.disabled = false;  
-	}, 30000);
-});
 
 enableSound$.addEventListener('click', async () => {
 	console.log('enable sound');
