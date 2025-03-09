@@ -229,6 +229,7 @@ function crewEndgame(crewEndgameType) {
 }
 
 socket.on('play-start', async () => {
+	defaultTasksLabel();
 	await playSound(SOUNDS.start);
 });
 
@@ -238,6 +239,7 @@ socket.on('play-meeting', async () => {
 		await clearInterval(window.currentOxygenCountdown);
 	 	window.currentOxygenCountdown = null;
 		enableMeetingButton()
+		enableSabotageButtons();
 		defaultTasksLabel()
 	}
 	timeLeft = 30; 
@@ -326,6 +328,7 @@ socket.on('do-reactor', async () => {
 socket.on('do-criticalSabotage-fixed', async () => {
 	stopSound();
 	clearTimeout(timeOutOxygen);
+	enableSabotageButtons();
 	enableMeetingButton();
 	if (window.currentOxygenCountdown) {
 		clearInterval(window.currentOxygenCountdown);
