@@ -45,11 +45,11 @@ function clearOutput() {
 
 function submitCode() {
     if (code.toString() === randomCodeOutput) {
-        socket.emit('oxygenHasBeenFixed')
+        socket.emit('oxygen-fixed')
         clearOutput()
 		playSound(SOUNDS.accept)
 		window.setTimeout(function(){
-			window.location = "https://google.com";
+			window.location = "about:blank";
 		}, 500);
     } else {
         playSound(SOUNDS.failed)
@@ -73,3 +73,17 @@ async function playSound(url) {
 	await soundPlayer.play();
 }
 
+function resetTimer() {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        window.location.href = "about:blank";
+    }, 2000); // 5 seconds
+}
+
+document.addEventListener("mousemove", resetTimer);
+document.addEventListener("keydown", resetTimer);
+document.addEventListener("scroll", resetTimer);
+document.addEventListener("touchstart", resetTimer); 
+document.addEventListener("touchmove", resetTimer);
+
+resetTimer();

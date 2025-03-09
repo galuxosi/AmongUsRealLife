@@ -12,10 +12,11 @@ const report$ = document.querySelector('#report');
 const tasks$ = document.querySelector('#tasks');
 const tasksLabel$ = document.querySelector('#tasksLabel');
 const progressLabel$ = document.querySelector('#progressLabel');
+const progressGreen$ = document.querySelector('#progressGreen')
 const oxygen$ = document.querySelector("#oxygen")
 const comms$ = document.querySelector('#comms');
 const reactor$ = document.querySelector('#reactor');
-const lights$ = document.querySelector("#lights")
+const lights$ = document.querySelector("#lights");
 
 let sabotageActive = false
 let countdownInterval;
@@ -148,30 +149,106 @@ async function wait(milliseconds) {
 	});
 }
 
+function disableSabotageButtons() {
+    [comms$, lights$, oxygen$, reactor$].forEach(button => {
+        button.disabled = true;
+        button.style.backgroundColor = "darkred";
+    });
+
+}
+function enableSabotageButtons() {
+    setTimeout(() => {
+        [comms$, lights$, oxygen$, reactor$].forEach(button => {
+            button.disabled = false;
+            button.style.backgroundColor = "#e72f2f";
+        });
+    }, 30000);
+}
+
+function enableSabotageButtonsForce() {
+	[comms$, lights$, oxygen$, reactor$].forEach(button => {
+		button.disabled = false;
+		button.style.backgroundColor = "#e72f2f";
+	});
+}
+
+function disableMeetingButton() {
+	emergencyMeeting$.disabled = true;
+    emergencyMeeting$.style.backgroundColor = "#A9A9A9";
+}
+
+function enableMeetingButton() {
+	emergencyMeeting$.disabled = false;
+	emergencyMeeting$.style.backgroundColor = "#F0F0F0";
+}
+
+function disableReportButton() {
+	report$.disabled = true;
+    report$.style.backgroundColor = "#A9A9A9";
+}
+
+function enableReportButton() {
+	report$.disabled = false;
+	report$.style.backgroundColor = "#F0F0F0";
+}
+
+function editTasksLabel(sabotageType) {
+	tasksLabel$.innerHTML = sabotageType;
+	tasksLabel$.style.color = "#ff0000";
+}
+
+function defaultTasksLabel() {
+	tasksLabel$.innerHTML = "Завдання";
+	tasksLabel$.style.color = "#000000";
+}
+
+function sabotageEndgame(sabotageEndgameType) {
+	timeLeft = 30;
+	playSound(SOUNDS.youLose);
+	enableSabotageButtonsForce();
+	enableMeetingButton();
+	defaultTasksLabel();
+	if (window.currentOxygenCountdown) {
+		clearInterval(window.currentOxygenCountdown);
+		window.currentOxygenCountdown = null;
+	}
+	editTasksLabel(sabotageEndgameType)
+}
+
+function crewEndgame(crewEndgameType) {
+	timeLeft = 30;
+	playSound(SOUNDS.youWin);
+	enableSabotageButtonsForce();
+	enableMeetingButton();
+	defaultTasksLabel();
+	if (window.currentOxygenCountdown) {
+		clearInterval(window.currentOxygenCountdown);
+		window.currentOxygenCountdown = null;
+	}
+	editTasksLabel(crewEndgameType)
+}
+
 socket.on('play-start', async () => {
 	await playSound(SOUNDS.start);
 });
 
 socket.on('play-meeting', async () => {
-	await playSound(SOUNDS.meeting);
-	await wait(2000);
-	await playSound(SOUNDS.sussyBoy);
 	await clearTimeout(timeOutOxygen);
 	if (window.currentOxygenCountdown) {
 		await clearInterval(window.currentOxygenCountdown);
 	 	window.currentOxygenCountdown = null;
-		emergencyMeeting$.disabled = false;	
-		tasksLabel$.innerHTML = "Завдання";
-		tasksLabel$.style.color = "#000000";
+		enableMeetingButton()
+		defaultTasksLabel()
 	}
-
 	timeLeft = 30; 
-
+	await playSound(SOUNDS.meeting);
+	await wait(2000);
+	await playSound(SOUNDS.sussyBoy);
 });
 
 socket.on('play-win', async () => {
 	await playSound(SOUNDS.youWin);
-	window.alert("Гра завершена. Члени екіпажу виконали всі завдання.")
+	crewEndgame("Гра завершена. Екіпаж виконав усі завдання.")
 });
 
 socket.on('play-disconnect', async () => {
@@ -179,182 +256,92 @@ socket.on('play-disconnect', async () => {
 });
 
 socket.on('do-comms', async () => {
-	await playSound(SOUNDS.comms);
-	comms$.disabled = true;   
-	reactor$.disabled = true;   
-	lights$.disabled = true;   
-	oxygen$.disabled = true;
-	tasks$.style.display = 'none';   
-	progressLabel$.style.display = 'none';
-	emergencyMeeting$.disabled = true;
-	tasksLabel$.innerHTML = "Саботаж зв`язку";
-	tasksLabel$.style.color = "#ff0000";
+	playSound(SOUNDS.comms, true);
+	disableSabotageButtons();
+	disableMeetingButton();
+	editTasksLabel("Саботаж комунікаційного модуля")
+	progressGreen$.style.display = 'none'
+    tasks$.style.display = 'none';
+    progressLabel$.style.display = 'none';
 });
 
 socket.on('do-comms-fixed', async () => {
-	setTimeout(() => {
-		comms$.disabled = false;   
-		reactor$.disabled = false;   
-		oxygen$.disabled = false;   
-		lights$.disabled = false;
-	}, 30000);   
-	tasksLabel$.innerHTML = "Завдання";
-	tasksLabel$.style.color = "#000000";
+	stopSound();
+    enableSabotageButtons();
+	enableMeetingButton();
+	defaultTasksLabel();
+	progressGreen$.style.display = 'block'
 	tasks$.style.display = 'block'
 	progressLabel$.style.display = 'block'
-	emergencyMeeting$.disabled = false;   
-	stopSound();
 });
 
 socket.on('do-lights', async () => {
-	playSound(SOUNDS.powerdown);
-	comms$.disabled = true; 
-	reactor$.disabled = true;   
-	lights$.disabled = true;  
-	oxygen$.disabled = true; 
-	report$.disabled = true;
-	emergencyMeeting$.disabled = true;
-	tasks$.style.display = 'none';
-	tasksLabel$.innerHTML = "Саботаж світла";
-	tasksLabel$.style.color = "#ff0000";
+	playSound(SOUNDS.powerdown, false);
+	disableSabotageButtons()
+	disableMeetingButton()
+	disableReportButton();
+	editTasksLabel("Полагодьте світло")
 });
 
 socket.on('do-lights-fixed', async () => {
 	stopSound();
-	tasksLabel$.innerHTML = "Завдання";
-	tasksLabel$.style.color = "#000000";
-	tasks$.style.display = 'block';
-	emergencyMeeting$.disabled = false;
-	report$.disabled = false;
-	setTimeout(function() {
-		comms$.disabled = false;   
-		reactor$.disabled = false;   
-		lights$.disabled = false;   
-		oxygen$.disabled = false;  
-	}, 30000);
-});
-
-socket.on('do-reactor', async () => {
-	timeLeft = 30; 
-	await playSound(SOUNDS.reactor);
-	comms$.disabled = true;   
-	reactor$.disabled = true;   
-	lights$.disabled = true;   
-	oxygen$.disabled = true;   
-	emergencyMeeting$.disabled = true;
-	tasksLabel$.innerHTML = "Саботаж реактору " + timeLeft;
-	tasksLabel$.style.color = "#ff0000";
-	timeOutOxygen = setTimeout(() => {
-		playSound(SOUNDS.youLose);
-		comms$.disabled = false;   
-		reactor$.disabled = false;   
-		lights$.disabled = false;   
-		oxygen$.disabled = false;   
-		emergencyMeeting$.disabled = false;
-		timeLeft = 30;
-		tasksLabel$.innerHTML = "Завдання";
-		tasksLabel$.style.color = "#000000";
-		if (window.currentOxygenCountdown) {
-			clearInterval(window.currentOxygenCountdown);
-			window.currentOxygenCountdown = null;
-		}
-		window.alert("Гра закінчена. Предателі перемогли саботажем реактору.")
-	}, 30000);
-
-	await setTimeout(() => {
-		comms$.disabled = false;   
-		reactor$.disabled = false;   
-		lights$.disabled = false;   
-		oxygen$.disabled = false;  
-	}, 30000);
-
-	const countdownInterval = setInterval(() => {
-	timeLeft -= 1;
-	tasksLabel$.innerHTML = "Саботаж реактору " + timeLeft;
-
-	if (timeLeft <= 0) {
-		clearInterval(countdownInterval);
-		playSound(SOUNDS.youLose);
-	}
-	}, 1000);
-
-	window.currentOxygenCountdown = countdownInterval;
-});
-
-socket.on('do-reactorFixedFully', async () => {
-	stopSound();
-	clearTimeout(timeOutOxygen);
-	emergencyMeeting$.disabled = 'false';
-	if (window.currentOxygenCountdown) {
-		clearInterval(window.currentOxygenCountdown);
-		window.currentOxygenCountdown = null;
-	}
-	timeLeft = 30; 
-	tasksLabel$.innerHTML = "Завдання";
-	tasksLabel$.style.color = "#000000";
+	enableSabotageButtons();
+	enableMeetingButton()
+	enableReportButton();
+	defaultTasksLabel();
 });
 
 socket.on('do-oxygen', async () => {
 	timeLeft = 30; 
-	await playSound(SOUNDS.reactor);
-	comms$.disabled = true; 
-	reactor$.disabled = true;   
-	lights$.disabled = true;  
-	oxygen$.disabled = true; 
-	emergencyMeeting$.disabled = true;
-	tasksLabel$.innerHTML = "Саботаж кисню " + timeLeft;
-	tasksLabel$.style.color = "#ff0000";
-	timeOutOxygen = setTimeout(() => {
-		playSound(SOUNDS.youLose);
-		comms$.disabled = false;   
-		reactor$.disabled = false;   
-		lights$.disabled = false;   
-		oxygen$.disabled = false;  
-		emergencyMeeting$.disabled = false;
-		timeLeft = 30;
-		tasksLabel$.innerHTML = "Завдання";
-		tasksLabel$.style.color = "#000000";
-		window.alert("Гра завершена. Предателі перемогли саботажем кисню.")
-		if (window.currentOxygenCountdown) {
-			clearInterval(window.currentOxygenCountdown);
-			window.currentOxygenCountdown = null;
-		}
-	}, 30000);
-
-	await setTimeout(() => {
-		comms$.disabled = false;   
-		reactor$.disabled = false;   
-		lights$.disabled = false;   
-		oxygen$.disabled = false;  
-	}, 30000);
-
+	playSound(SOUNDS.reactor);
+	disableSabotageButtons();
+	disableMeetingButton();
+	editTasksLabel("Витік кисню через " + timeLeft)
 	const countdownInterval = setInterval(() => {
 		timeLeft -= 1;
-		tasksLabel$.innerHTML = "Саботаж кисню " + timeLeft;
-
+		editTasksLabel("Витік кисню через " + timeLeft)
 		if (timeLeft <= 0) {
 			clearInterval(countdownInterval);
-			playSound(SOUNDS.youLose);
+			sabotageEndgame("Гра закінчена. Предателі перемогли саботажем кисню.")
 		}}, 1000);
 	window.currentOxygenCountdown = countdownInterval;
-	});
+});
 
-socket.on('do-oxygenHasBeenFixed', async () => {
+socket.on('do-reactor', async () => {
+	timeLeft = 30; 
+	playSound(SOUNDS.reactor);
+	disableSabotageButtons();
+	disableMeetingButton();
+	editTasksLabel("Вибух реактора через " + timeLeft)
+	const countdownInterval = setInterval(() => {
+		timeLeft -= 1;
+		editTasksLabel("Вибух реактора через " + timeLeft)
+		if (timeLeft <= 0) {
+			clearInterval(countdownInterval);
+			sabotageEndgame("Гра закінчена. Предателі перемогли саботажем реактору.")
+		}}, 1000);
+	window.currentOxygenCountdown = countdownInterval;
+});
+
+socket.on('do-criticalSabotage-fixed', async () => {
 	stopSound();
 	clearTimeout(timeOutOxygen);
-	emergencyMeeting$.disabled = false;
-
+	enableMeetingButton();
 	if (window.currentOxygenCountdown) {
 		clearInterval(window.currentOxygenCountdown);
 		window.currentOxygenCountdown = null;
 	}
-
 	timeLeft = 30; 
-	tasksLabel$.innerHTML = "Завдання";
-	tasksLabel$.style.color = "#000000";
-	emergencyMeeting$.disabled = false;
+	defaultTasksLabel();
 });
 
+socket.on('do-dead', async () => {
+	sabotageEndgame("Гра закінчена. Предателі вбили усіх членів екіпажу.")
+});
+
+socket.on('do-ejected', async () => {
+	crewEndgame("Гра закінчена. Усі предателі були викинуті.")
+});
 
 enableSound$.addEventListener('click', async () => {
 	console.log('enable sound');
@@ -362,13 +349,15 @@ enableSound$.addEventListener('click', async () => {
 	soundPlayer.play();
 });
 
-async function playSound(url) {
-	soundPlayer.src = url;
-	await soundPlayer.play();
+async function playSound(url, loop = false) {
+    soundPlayer.src = url;
+    soundPlayer.loop = loop;
+    await soundPlayer.play();
 }
 
 async function stopSound(url) {
+    await soundPlayer.pause();
+    soundPlayer.currentTime = 0;
+    soundPlayer.loop = false;
 	soundPlayer.src = url;
-	await soundPlayer.pause();
-	soundPlayer.currentTime = 0;
 }

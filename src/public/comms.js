@@ -32,7 +32,7 @@ function randomizeNumbers() {
     });
     
     var keypad = document.getElementById('keypad');
-    keypad.innerHTML = ''; // Clear existing buttons
+    keypad.innerHTML = '';
     for (var i = 0; i < correctSequence.length; i++) {
         var button = document.createElement('button');
         button.textContent = correctSequence[i];
@@ -55,7 +55,7 @@ function pressNumber(number) {
             // Task completed
             setTimeout(function() {
                 alert('Саботаж був поремонтований. Сайт буде закритий.');
-                window.location = "https://google.com" // Randomize again for the next round
+                window.location = "about:blank"
             }, 500);
             playCompleteSound();
             socket.emit('comms-fixed')
@@ -70,10 +70,27 @@ function pressNumber(number) {
             for (var i = 0; i < buttons.length; i++) {
                 buttons[i].classList.remove('wrong');
             }
-            randomizeNumbers(); // Randomize again
+            randomizeNumbers(); 
         }, 500);
     }
 }
+
+let timeout;
+
+function resetTimer() {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        window.location.href = "about:blank";
+    }, 2000); // 5 seconds
+}
+
+document.addEventListener("mousemove", resetTimer);
+document.addEventListener("keydown", resetTimer);
+document.addEventListener("scroll", resetTimer);
+document.addEventListener("touchstart", resetTimer); 
+document.addEventListener("touchmove", resetTimer);
+
+resetTimer();
 
 // Initialize the keypad when the page loads
 window.onload = randomizeNumbers;

@@ -14,12 +14,12 @@ button {
 	border-radius: 1rem;
 }
 
-button:disabled {
-    color: #666;
-}
-
 img {
 	width: 100%;
+}
+
+summary {
+	display: block;
 }
 
 #enable-sound {

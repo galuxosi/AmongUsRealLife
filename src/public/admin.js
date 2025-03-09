@@ -6,6 +6,12 @@ const socket = io({
 
 const startGame$ = document.querySelector('#start-game');
 const callOut$ = document.querySelector('#callOut');
+const comms$ = document.querySelector('#comms');
+const lights$ = document.querySelector('#lights');
+const oxygen$ = document.querySelector('#oxygen')
+const reactor$ = document.querySelector('#reactor');
+const dead$ = document.querySelector('#dead');
+const ejected$ = document.querySelector('#ejected');
 
 startGame$.addEventListener('click', () => {
 	socket.emit('start-game');
@@ -15,10 +21,6 @@ callOut$.addEventListener('click', () => {
 	socket.emit('callout');
 });
 
-/**
- * Sounds
- */
-	
 async function wait(milliseconds) {
 	await new Promise(resolve => {
 		setTimeout(() => resolve(), milliseconds);
@@ -26,7 +28,7 @@ async function wait(milliseconds) {
 }
 
 const SOUNDS = {
-	meeting: new Audio('/sounds/meeting.mp3'),
+	meeting: new Audio('/sounds/meeting.ogg'),
 	sabotage: new Audio('/sounds/sabotage.mp3'),
 	start: new Audio('/sounds/start.mp3'),
 	sussyBoy: new Audio('/sounds/sussy-boy.mp3'),
@@ -47,10 +49,26 @@ socket.on('play-win', async () => {
 	await SOUNDS.youWin.play();
 });
 
-socket.on('do-comms', async () => {
-	playSound(SOUNDS.comms);
+comms$.addEventListener('click', () => {
+	socket.emit('comms-fixed')
+})
+
+reactor$.addEventListener('click', () => {
+	socket.emit('reactor-fixed')
 });
 
-socket.on('do-reactor', async () => {
-	playSound(SOUNDS.reactorMeltdown);
+oxygen$.addEventListener('click', () => {
+	socket.emit('oxygen-fixed')
 });
+
+lights$.addEventListener('click', () => {
+	socket.emit('lights-fixed')
+})
+
+dead$.addEventListener('click', () => {
+	socket.emit('dead')
+})
+
+ejected$.addEventListener('click', () => {
+	socket.emit('ejected')
+})

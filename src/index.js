@@ -13,7 +13,7 @@ const io = new Server(server);
 
 
 const N_TASKS = 5;
-const N_IMPOSTORS = 2;
+const N_IMPOSTORS = 1;
 
 let taskProgress = {};
 let reactorProgress = 0;
@@ -165,47 +165,68 @@ io.on('connection', socket => {
 	});
 
 	socket.on('report', () => {
+		console.log("A dead body found.")
 		io.emit('play-meeting');
 	});
 
 	socket.on('emergency-meeting', () => {
+		console.log("The emergency button pressed.")
 		io.emit('play-meeting');
 	});
 
 	socket.on('comms', () => {
+		console.log("Comms sabotage started.")
 		io.emit('do-comms');
 	});
 
 	socket.on('comms-fixed', () => {
+		console.log("Comms sabotage fixed.")
 		io.emit('do-comms-fixed');
 	});
 
 	socket.on('lights', () => {
+		console.log("Lights sabotage started.")
 		io.emit('do-lights');
 	});
 
 	socket.on('lights-fixed', () => {
+		console.log("Lights sabotage fixed.")
 		io.emit('do-lights-fixed');
 	});
 
 	socket.on('oxygen', () => {
+		console.log("Oxygen sabotage started.")
 		io.emit('do-oxygen');
 	});
 
-	socket.on('oxygenHasBeenFixed', () => {
-		io.emit('do-oxygenHasBeenFixed');
+	socket.on('oxygen-fixed', () => {
+		console.log("Oxygen sabotage fixed.")
+		io.emit('do-criticalSabotage-fixed');
 	});
 	
 	socket.on('reactor', () => {
+		console.log("Reactor sabotage started.")
 		io.emit('do-reactor');
 	});
 
-	socket.on('reactorFixed', () => {
-		io.emit('do-reactorFixedFully') 
+	socket.on('reactor-fixed', () => {
+		console.log("Reactor sabotage fixed.")
+		io.emit('do-criticalSabotage-fixed') 
 	});
 
 	socket.on('callout', () => {
+		console.log("Callout pressed.")
 		io.emit('do-callout');
+	});
+
+	socket.on('dead', () => {
+		console.log("Everyone's dead.")
+		io.emit('do-dead');
+	});
+
+	socket.on('ejected', () => {
+		console.log("All impostors ejected.")
+		io.emit('do-ejected');
 	});
 
 	socket.on('task-complete', taskId => {

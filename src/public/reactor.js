@@ -13,7 +13,7 @@ const SOUNDS = {
 };
 
 fix$.addEventListener('click', () => {
-	socket.emit("reactorFixed")
+	socket.emit("reactor-fixed")
     image.src = 'images/reactor_wait.png';
 	yourImg.style.height = '1000px';
     yourImg.style.width = '1000px';
@@ -25,7 +25,7 @@ socket.on('do-reactor', async () => {
     yourImg.style.width = '1000px';
 })	
 
-socket.on('do-reactorFixedFully', async () => {
+socket.on('do-reactor-fixed', async () => {
     image.src = 'images/reactor_nominal.webp';
 	yourImg.style.height = '1000px';
     yourImg.style.width = '1000px';
@@ -41,4 +41,20 @@ async function playSound(url) {
 	soundPlayer.src = url;
 	await soundPlayer.play();
 }
+
+function resetTimer() {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        window.location.href = "about:blank";
+    }, 2000); // 5 seconds
+}
+
+document.addEventListener("mousemove", resetTimer);
+document.addEventListener("keydown", resetTimer);
+document.addEventListener("scroll", resetTimer);
+document.addEventListener("touchstart", resetTimer); 
+document.addEventListener("touchmove", resetTimer);
+
+resetTimer();
+
 
