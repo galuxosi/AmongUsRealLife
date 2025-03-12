@@ -4,6 +4,8 @@ const socket = io({
 	}
 });
 
+let playerName = '';
+
 // index.js ID's
 const emergencyMeeting$ = document.querySelector('#emergency-meeting');
 const enableSound$ = document.querySelector('#enable-sound');
@@ -21,8 +23,14 @@ const lights$ = document.querySelector("#lights");
 const map$ = document.querySelector('#map')
 const mapToggle$ = document.querySelector('#map-toggle')
 const sabotageButtons$ = document.querySelector('#sabotageButtons')
-const sabotageToggle$ = document.querySelector('#sabotage-toggle')
+const lobbyToggle$ = document.querySelector('#sabotage-toggle')
 const roleDiv$ = document.querySelector('#roleDiv')
+const playerLobby$ = document.querySelector('#player-lobby')
+const playerLobbyDiv$ = document.querySelector('#lobby-container')
+const nameInput$ = document.querySelector('#player-name-input')
+const nameSubmit$ = document.querySelector('#player-name-submit')
+const gameContent$ = document.querySelector('#game-content')
+const nameForm$ = document.querySelector('#name-form')
 
 // Defining variables
 let countdownInterval; // Countdown for idk
@@ -52,8 +60,20 @@ const SOUNDS = {
 
 // When page loaded
 window.onload = function() {
-	playSound(SOUNDS.join);
+	gameContent$.style.display = 'none';
 }
+
+// Submit player name
+nameSubmit$.addEventListener('click', (e) => {
+	e.preventDefault();
+	playerName = nameInput$.value.trim();
+	if (playerName) {
+		socket.emit('player-join', playerName);
+		nameForm$.style.display = 'none';
+		gameContent$.style.display = 'block';
+		playSound(SOUNDS.join);
+	}
+});
 
 // When "Report" button clicked
 report$.addEventListener('click', () => {
@@ -92,6 +112,40 @@ socket.on('do-callout', async () => {
 	await playSound(SOUNDS.callout)
 });
 
+// Update player lobby
+socket.on('update-players', (players) => {
+	// Clear existing players
+	playerLobby$.innerHTML = '';
+	
+	// Add each player to the lobby
+	players.forEach(player => {
+		const playerElement = document.createElement('div');
+		playerElement.classList.add('player-item');
+		
+		const playerName = document.createElement('span');
+		playerName.textContent = player.name;
+		
+		const removeButton = document.createElement('button');
+		removeButton.textContent = 'X';
+		removeButton.classList.add('remove-player');
+		removeButton.addEventListener('click', () => {});
+		
+		playerElement.appendChild(playerName);
+		playerLobby$.appendChild(playerElement);
+	});
+});
+
+// Handle player disconnect
+socket.on('player-leave', (playerId) => {
+	playSound(SOUNDS.leave);
+	document.querySelectorAll('#tasks input[type="checkbox"]').forEach(checkbox => {
+		if (!checkbox.checked) {
+			checkbox.checked = true;
+			socket.emit('task-complete', checkbox.dataset.taskId); // Ensure each task ID is emitted
+		}
+	});
+});
+
 // Assign a tasks for every player
 socket.on('tasks', tasks => {
 	// Remove existing tasks
@@ -105,11 +159,8 @@ socket.on('tasks', tasks => {
 
 		const checkbox$ = document.createElement('input');
 		checkbox$.type = 'checkbox';
-		// checkbox.name = "name";
-		// checkbox.value = "value";
-		// checkbox.id = "id";
+		checkbox$.dataset.taskId = taskId; // Store the task ID in the checkbox
 		checkbox$.onchange = event => {
-			console.log('checkbox change', event.target.checked);
 			if (event.target.checked) {
 				socket.emit('task-complete', taskId);
 			} else {
@@ -150,6 +201,10 @@ socket.on('progress', progress => {
 	progressBar$.style.width = `${progress * 100}%`;
 });
 
+socket.on('disconnect', () => {
+    socket.emit('player-tasks-complete');
+});
+
 // Hide role button
 function hideRole() {
 	document.querySelectorAll('.role').forEach(element => (element.style.display = 'none'));
@@ -170,11 +225,11 @@ function toggleMap() {
 	}
 }
 
-function toggleSabotages() {
-    if (sabotageButtons$.style.display === "inline-flex" || sabotageButtons$.style.display === "") {
-        sabotageButtons$.style.display = "none";
+function toggleLobby() {
+    if (playerLobbyDiv$.style.display === "block" || playerLobbyDiv$.style.display === "") {
+        playerLobbyDiv$.style.display = "none";
     } else {
-        sabotageButtons$.style.display = "inline-flex";
+        playerLobbyDiv$.style.display = "block";
     }
 }
 

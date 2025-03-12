@@ -12,6 +12,11 @@ const oxygen$ = document.querySelector('#oxygen')
 const reactor$ = document.querySelector('#reactor');
 const dead$ = document.querySelector('#dead');
 const ejected$ = document.querySelector('#ejected');
+const playerLobby$ = document.querySelector('#player-lobby')
+const nameInput$ = document.querySelector('#player-name-input')
+const nameSubmit$ = document.querySelector('#player-name-submit')
+const gameContent$ = document.querySelector('#game-content')
+const nameForm$ = document.querySelector('#name-form')
 
 startGame$.addEventListener('click', () => {
 	socket.emit('start-game');
@@ -72,3 +77,28 @@ dead$.addEventListener('click', () => {
 ejected$.addEventListener('click', () => {
 	socket.emit('ejected')
 })
+
+socket.on('update-players', (players) => {
+	// Clear existing players
+	playerLobby$.innerHTML = '';
+	
+	// Add each player to the lobby
+	players.forEach(player => {
+		const playerElement = document.createElement('div');
+		playerElement.classList.add('player-item');
+		
+		const playerName = document.createElement('span');
+		playerName.textContent = player.name;
+		
+		const removeButton = document.createElement('button');
+		removeButton.textContent = 'X';
+		removeButton.classList.add('remove-player');
+		removeButton.addEventListener('click', () => {
+			socket.emit('remove-player', player.id);
+		});
+		
+		playerElement.appendChild(playerName);
+		playerElement.appendChild(removeButton);
+		playerLobby$.appendChild(playerElement);
+	});
+});

@@ -16,3 +16,49 @@ button {
 img {
 	width: 100%;
 }
+.lobby {
+	border: 2px solid #000;
+	border-radius: 8px;
+	padding: 10px;
+	margin-bottom: 20px;
+	max-width: 400px;
+	background-color: #f0f0f0;
+}
+
+.player-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 8px;
+	margin-bottom: 5px;
+	background-color: #fff;
+	border-radius: 5px;
+	border-left: 5px solid #e72f2f;
+}
+
+.player-item span {
+	font-weight: bold;
+}
+
+.remove-player {
+	max-width: 2rem;
+	padding: 0;
+	border-radius: 50%;
+	background-color: #e72f2f;
+	color: white;
+	font-weight: bold;
+	border: none;
+	cursor: pointer;
+}
+
+#player-name-submit {
+	border-radius: 0 5px 5px 0;
+}
+
+#name-form {
+	max-width: 400px;
+}
+
+#lobby-container {
+	margin-top: 20px;
+}

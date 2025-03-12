@@ -16,7 +16,7 @@ const N_TASKS = 5;
 const N_IMPOSTORS = 1;
 
 let taskProgress = {};
-let reactorProgress = 0;
+let players = [];
 
 app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname, 'views', 'index.html'));
@@ -54,6 +54,51 @@ io.on('connection', socket => {
 			io.of('/').sockets.size
 		}`
 	);
+
+	// When player joins with a name
+	socket.on('player-join', (playerName) => {
+		// Add player to the list
+		players.push({
+			id: socket.id,
+			name: playerName,
+			role: socket.handshake.query.role
+		});
+		
+		// Update all clients with the new player list
+		io.emit('update-players', players);
+		
+		console.log(`Player ${playerName} joined the game`);
+	});
+	
+	// When player is removed
+	socket.on('remove-player', (playerId) => {
+		players = players.filter(player => player.id !== playerId);
+		io.emit('update-players', players);
+		io.to(playerId).emit('player-leave');
+		console.log(`Player ${playerId} was removed from the game`);
+	});
+	
+	// When a player disconnects
+	socket.on('disconnect', () => {
+		const playerId = socket.id;
+		const disconnectedPlayer = players.find(player => player.id === socket.id);
+		if (disconnectedPlayer) {
+			console.log(`Player ${disconnectedPlayer.name} disconnected`);
+			players = players.filter(player => player.id !== socket.id);
+			io.emit('update-players', players);
+		}
+		const player = players[socket.id]; // Get the player that disconnected
+		if (players[playerId]) {
+			tasks.forEach((taskId) => {
+				io.emit('task-complete', taskId);
+			});
+	
+			// Надсилаємо всім оновлення
+			io.emit('complete-tasks-for-player', playerId);
+		}
+		delete players[playerId]; // Видалити гравця зі списку
+		io.emit('update-players', Object.values(players));
+	});
 
 	socket.on('start-game', () => {
 		io.emit('play-start');
@@ -102,14 +147,14 @@ io.on('connection', socket => {
 			'Турніки: З`їздьте з гірки',
 		];
 		// Get player sockets
-		const players = [];
+		const playerSockets = [];
 		for (const [_, socket] of io.of('/').sockets) {
 			if (socket.handshake.query.role === 'PLAYER') {
-				players.push(socket);
+				playerSockets.push(socket);
 			}
 		}
-		const playerIds = players.map(player => player.id);
-		console.log('player sockets', players.length);
+		const playerIds = playerSockets.map(player => player.id);
+		console.log('player sockets', playerSockets.length);
 
 		// Assign impostors
 		const impostors = _.shuffle(playerIds).slice(0, N_IMPOSTORS);
@@ -134,7 +179,7 @@ io.on('connection', socket => {
 		// Assign tasks
 		taskProgress = {};
 		for (let i = 0; i < N_TASKS; i++) {
-			for (const player of players) {
+			for (const player of playerSockets) {
 				// Make sure there's a pool of shuffled tasks
 				if (shuffledTasks.length === 0) {
 					shuffledTasks = _.shuffle(TASKS);
@@ -241,8 +286,8 @@ io.on('connection', socket => {
 			taskProgress[taskId] = false;
 		}
 		emitTaskProgress();
-
-})});
+	});
+});
 
 function emitTaskProgress() {
 	const tasks = Object.values(taskProgress);
