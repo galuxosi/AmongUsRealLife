@@ -4,6 +4,7 @@ const socket = io({
 	}
 });
 
+// index.js ID's
 const emergencyMeeting$ = document.querySelector('#emergency-meeting');
 const enableSound$ = document.querySelector('#enable-sound');
 const progress$ = document.querySelector('#progress');
@@ -13,15 +14,21 @@ const tasks$ = document.querySelector('#tasks');
 const tasksLabel$ = document.querySelector('#tasksLabel');
 const progressLabel$ = document.querySelector('#progressLabel');
 const progressGreen$ = document.querySelector('#progressGreen')
-const oxygen$ = document.querySelector("#oxygen")
+const oxygen$ = document.querySelector('#oxygen')
 const comms$ = document.querySelector('#comms');
 const reactor$ = document.querySelector('#reactor');
 const lights$ = document.querySelector("#lights");
+const map$ = document.querySelector('#map')
+const mapToggle$ = document.querySelector('#map-toggle')
+const sabotageButtons$ = document.querySelector('#sabotageButtons')
+const sabotageToggle$ = document.querySelector('#sabotage-toggle')
+const roleDiv$ = document.querySelector('#roleDiv')
 
-let sabotageActive = false
-let countdownInterval;
-let timeOutOxygen;
+// Defining variables
+let countdownInterval; // Countdown for idk
+let timeOutSabotage; // Countdown for sabotage
 
+// Sounds
 const soundPlayer = new Audio();
 const SOUNDS = {
 	meeting: '/sounds/meeting.ogg',
@@ -43,41 +50,49 @@ const SOUNDS = {
 	callout: '/sounds/callout.ogg'
 };
 
+// When page loaded
 window.onload = function() {
 	playSound(SOUNDS.join);
 }
 
+// When "Report" button clicked
 report$.addEventListener('click', () => {
 	socket.emit('report');
 });
 
+// When "Emergency meeting" button clicked
 emergencyMeeting$.addEventListener('click', () => {
 	socket.emit('emergency-meeting');
 	emergencyMeeting$.disabled = true;
 });
 
+// When communications sabotage clicked
 comms$.addEventListener('click', () => {
 	socket.emit('comms')
 	sabotageActive = true
 })
 
-reactor$.addEventListener('click', () => {
-	socket.emit('reactor')
-});
-
-oxygen$.addEventListener('click', () => {
-	socket.emit('oxygen')
-});
-
+// When lights sabotage clicked
 lights$.addEventListener('click', () => {
 	socket.emit('lights')
 })
 
+// When oxygen sabotage clicked
+oxygen$.addEventListener('click', () => {
+	socket.emit('oxygen')
+});
+
+// When reactor sabotage clicked
+reactor$.addEventListener('click', () => {
+	socket.emit('reactor')
+});
+
+// When callout called (from admin.html)
 socket.on('do-callout', async () => {
 	await playSound(SOUNDS.callout)
 });
 
-
+// Assign a tasks for every player
 socket.on('tasks', tasks => {
 	// Remove existing tasks
 	while (tasks$.firstChild) {
@@ -110,6 +125,7 @@ socket.on('tasks', tasks => {
 	}
 });
 
+// Assign a role
 socket.on('role', role => {
     hideRole();
     let isRoleHidden = true;
@@ -126,27 +142,40 @@ socket.on('role', role => {
         }
         playSound(SOUNDS.button);
     }
-
-    document.body.appendChild(role$);    
+    roleDiv$.appendChild(role$);    
 });
-
-function hideRole() {
-	document.querySelectorAll('.role').forEach(element => (element.style.display = 'none'));
-}
 
 socket.on('progress', progress => {
 	progress$.innerHTML = (progress * 100).toFixed(0);
 	progressBar$.style.width = `${progress * 100}%`;
 });
 
-/**
- * Sounds
- */
+// Hide role button
+function hideRole() {
+	document.querySelectorAll('.role').forEach(element => (element.style.display = 'none'));
+}
+
 
 async function wait(milliseconds) {
 	await new Promise(resolve => {
 		setTimeout(() => resolve(), milliseconds);
 	});
+}
+
+function toggleMap() {
+	if (map$.style.display === "block" || map$.style.display === "") {
+		map$.style.display = "none";
+	} else {
+		map$.style.display = "block";
+	}
+}
+
+function toggleSabotages() {
+    if (sabotageButtons$.style.display === "inline-flex" || sabotageButtons$.style.display === "") {
+        sabotageButtons$.style.display = "none";
+    } else {
+        sabotageButtons$.style.display = "inline-flex";
+    }
 }
 
 function disableSabotageButtons() {
@@ -234,7 +263,7 @@ socket.on('play-start', async () => {
 });
 
 socket.on('play-meeting', async () => {
-	await clearTimeout(timeOutOxygen);
+	await clearTimeout(timeOutSabotage);
 	if (window.currentOxygenCountdown) {
 		await clearInterval(window.currentOxygenCountdown);
 	 	window.currentOxygenCountdown = null;
@@ -249,7 +278,6 @@ socket.on('play-meeting', async () => {
 });
 
 socket.on('play-win', async () => {
-	await playSound(SOUNDS.youWin);
 	crewEndgame("Гра завершена. Екіпаж виконав усі завдання.")
 });
 
@@ -327,7 +355,7 @@ socket.on('do-reactor', async () => {
 
 socket.on('do-criticalSabotage-fixed', async () => {
 	stopSound();
-	clearTimeout(timeOutOxygen);
+	clearTimeout(timeOutSabotage);
 	enableSabotageButtons();
 	enableMeetingButton();
 	if (window.currentOxygenCountdown) {

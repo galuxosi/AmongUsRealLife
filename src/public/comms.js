@@ -77,20 +77,9 @@ function pressNumber(number) {
 
 let timeout;
 
-function resetTimer() {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
         window.location.href = "about:blank";
-    }, 2000); // 5 seconds
-}
+}});
 
-document.addEventListener("mousemove", resetTimer);
-document.addEventListener("keydown", resetTimer);
-document.addEventListener("scroll", resetTimer);
-document.addEventListener("touchstart", resetTimer); 
-document.addEventListener("touchmove", resetTimer);
-
-resetTimer();
-
-// Initialize the keypad when the page loads
 window.onload = randomizeNumbers;

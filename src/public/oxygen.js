@@ -15,6 +15,12 @@ const SOUNDS = {
 	button: '/sounds/button.ogg'
 };
 
+window.onload = (event) => {
+	randomCode = Math.floor(10000 + Math.random() * 90000);
+	randomCodeOutput = randomCode.toString();
+	document.getElementById('random').value = randomCodeOutput
+};
+
 const keypad$ = document.querySelector('#keypad');
 
 keypad$.addEventListener('click', () => {
@@ -24,12 +30,6 @@ keypad$.addEventListener('click', () => {
 let randomCodeOutput = '';
 let randomCode = '';
 let code = '';
-
-function generateRandomNumber() {
-	randomCode = Math.floor(10000 + Math.random() * 90000);
-	randomCodeOutput = randomCode.toString();
-	document.getElementById('random').value = randomCodeOutput
-}
 
 function addNumber(number) {
 	if (code.length < 5) {
@@ -79,6 +79,11 @@ function resetTimer() {
         window.location.href = "about:blank";
     }, 2000); // 5 seconds
 }
+
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        window.location.href = "about:blank";
+}});
 
 document.addEventListener("mousemove", resetTimer);
 document.addEventListener("keydown", resetTimer);
