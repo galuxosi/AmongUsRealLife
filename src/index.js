@@ -15,6 +15,8 @@ const io = new Server(server);
 const N_TASKS = 5;
 const N_IMPOSTORS = 1;
 
+let livingCrewMembers = [];
+let livingImpostors = [];
 let taskProgress = {};
 let players = [];
 
@@ -146,16 +148,25 @@ io.on('connection', socket => {
 
 		// Assign impostors
 		const impostors = _.shuffle(playerIds).slice(0, N_IMPOSTORS);
+		const impostorNames = players
+		  .filter(player => impostors.includes(player.id))
+		  .map(player => player.name);
+		
 		for (const [id, socket] of io.of('/').sockets) {
-			if (socket.handshake.query.role === 'PLAYER') {
-				if (impostors.includes(id)) {
-					socket.emit('role', 'Предатель');
-					console.log(id, 'is impostor');
-				} else {
-					socket.emit('role', 'Член Екіпажу');
-					console.log(id, 'is crew');
-				}
+		  if (socket.handshake.query.role === 'PLAYER') {
+			if (impostors.includes(id)) {
+			  const otherImpostors = impostorNames.filter(name => name !== players.find(p => p.id === id).name);
+			  socket.emit('role', { 
+				role: 'Предатель', 
+				teammates: otherImpostors 
+			  });
+			} else {
+			  socket.emit('role', { 
+				role: 'Член Екіпажу', 
+				teammates: [] 
+			  });
 			}
+		  }
 		}
 
 		// Pool of tasks so they are distributed evenly
@@ -195,6 +206,20 @@ io.on('connection', socket => {
 		}
 
 		emitTaskProgress();
+
+		livingCrewMembers = [];
+		livingImpostors = [];
+		
+		// Initialize living players lists
+		for (const [id, socket] of io.of('/').sockets) {
+			if (socket.handshake.query.role === 'PLAYER') {
+				if (impostors.includes(id)) {
+					livingImpostors.push(id);
+				} else {
+					livingCrewMembers.push(id);
+				}
+			}
+		}
 	});
 
 	socket.on('report', () => {
@@ -262,6 +287,36 @@ io.on('connection', socket => {
 		io.emit('do-ejected');
 	});
 
+	socket.on('player-ejected', () => {
+		console.log(`Impostor ${socket.id} was ejected`);
+		
+		// Remove from living impostors list
+		livingImpostors = livingImpostors.filter(id => id !== socket.id);
+		
+		// Check if all impostors are ejected
+		if (livingImpostors.length === 0) {
+			console.log("All impostors ejected. Crew wins!");
+			io.emit('do-ejected');
+		} else {
+			// Notify all players that an impostor was ejected
+			io.emit('impostor-ejected');
+			
+			// Check win condition in case this changes the game state
+			checkWinCondition();
+		}
+	});
+	
+	// Modify the player-dead event handler to not use role parameter
+	socket.on('player-dead', () => {
+		console.log(`Crew member ${socket.id} is dead`);
+		
+		// Update living crew members count
+		livingCrewMembers = livingCrewMembers.filter(id => id !== socket.id);
+		
+		// Check win condition
+		checkWinCondition();
+	});
+
 	socket.on('task-complete', taskId => {
 		if (typeof taskProgress[taskId] === 'boolean') {
 			taskProgress[taskId] = true;
@@ -276,6 +331,16 @@ io.on('connection', socket => {
 		emitTaskProgress();
 	});
 });
+
+function checkWinCondition() {
+    console.log(`Living crew: ${livingCrewMembers.length}, Living impostors: ${livingImpostors.length}`);
+    
+    // Impostors win if they have equal or more players than crew
+    if (livingImpostors.length > 0 && livingImpostors.length >= livingCrewMembers.length) {
+        console.log("Impostors win by eliminating enough crew members");
+        io.emit('do-dead');
+    }
+}
 
 function emitTaskProgress() {
 	const tasks = Object.values(taskProgress);

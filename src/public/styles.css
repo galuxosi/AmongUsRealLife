@@ -104,3 +104,15 @@ summary {
 #lobby-container {
 	margin-top: 20px;
 }
+
+#dead-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    filter: grayscale(100%);
+}

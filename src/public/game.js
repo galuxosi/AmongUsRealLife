@@ -31,8 +31,11 @@ const nameInput$ = document.querySelector('#player-name-input')
 const nameSubmit$ = document.querySelector('#player-name-submit')
 const gameContent$ = document.querySelector('#game-content')
 const nameForm$ = document.querySelector('#name-form')
+const deadButton$ = document.querySelector('#dead-button');
 
 // Defining variables
+let playerRole = '';
+let isDead = false;
 let countdownInterval; // Countdown for idk
 let timeOutSabotage; // Countdown for sabotage
 
@@ -177,23 +180,35 @@ socket.on('tasks', tasks => {
 });
 
 // Assign a role
-socket.on('role', role => {
+socket.on('role', ({role, teammates}) => {
     hideRole();
+	playerRole = role;
     let isRoleHidden = true;
     const role$ = document.createElement('a');
     role$.classList.add('role');
     role$.textContent = `Натисніть щоби показати роль`;
+    
+    let roleText = `Ви ${role}.`;
+    if (teammates.length > 0) {
+        if (teammates.length === 1) {
+            roleText += ` Разом із ${teammates[0]}`;
+        } else {
+            const last = teammates.pop();
+            roleText += ` Разом із ${teammates.join(', ')} та ${last}`;
+        }
+    }
+
     role$.onclick = () => {
         if (!isRoleHidden) {
             role$.textContent = 'Натисніть щоби показати роль';
             isRoleHidden = true;
         } else {
-            role$.textContent = `Ви ${role}. Натисніть щоби приховати`;
+            role$.textContent = `${roleText}. Натисніть щоби приховати`;
             isRoleHidden = false;
         }
         playSound(SOUNDS.button);
     }
-    roleDiv$.appendChild(role$);    
+    roleDiv$.appendChild(role$);
 });
 
 socket.on('progress', progress => {
@@ -203,7 +218,9 @@ socket.on('progress', progress => {
 
 // Hide role button
 function hideRole() {
-	document.querySelectorAll('.role').forEach(element => (element.style.display = 'none'));
+    document.querySelectorAll('.role').forEach(element => {
+        element.style.display = 'none';
+    });
 }
 
 async function wait(milliseconds) {
@@ -308,8 +325,9 @@ function crewEndgame(crewEndgameType) {
 }
 
 socket.on('play-start', async () => {
-	defaultTasksLabel();
-	await playSound(SOUNDS.start);
+    resetGame(); // Add this line to reset everything
+    defaultTasksLabel();
+    await playSound(SOUNDS.start);
 });
 
 socket.on('play-meeting', async () => {
@@ -416,6 +434,30 @@ socket.on('do-criticalSabotage-fixed', async () => {
 	defaultTasksLabel();
 });
 
+deadButton$.addEventListener('click', () => {
+    if (!isDead) {
+        isDead = true;
+        deadButton$.disabled = true;
+        deadButton$.style.backgroundColor = "#A9A9A9";
+        
+        if (playerRole === 'Предатель') {
+            socket.emit('player-ejected');
+            disableReportButton();
+            disableMeetingButton();
+            // Note: Impostors can still use sabotage buttons
+        } else {
+            socket.emit('player-dead');
+            disableReportButton();
+            disableMeetingButton();
+            disableSabotageButtons();
+        }
+    }
+});
+
+socket.on('check-win-condition', () => {
+    // Handle UI updates when win condition check happens
+});
+
 socket.on('do-dead', async () => {
 	sabotageEndgame("Гра закінчена. Предателі вбили усіх членів екіпажу.")
 });
@@ -424,10 +466,43 @@ socket.on('do-ejected', async () => {
 	crewEndgame("Гра закінчена. Усі предателі були викинуті.")
 });
 
+socket.on('impostor-ejected', () => {
+    // Optional: Play a sound or show a message when an impostor is ejected
+    playSound(SOUNDS.voteResult);
+});
+
 async function playSound(url, loop = false) {
     soundPlayer.src = url;
     soundPlayer.loop = loop;
     await soundPlayer.play();
+}
+
+function resetGame() {
+    // Reset player state
+    isDead = false;
+
+	while (roleDiv$.firstChild) {
+        roleDiv$.removeChild(roleDiv$.firstChild);
+    }
+    // Enable all buttons
+    enableReportButton();
+    enableMeetingButton();
+    enableSabotageButtonsForce();
+    
+    // Reset dead button
+    deadButton$.disabled = false;
+    
+    // Reset task display
+    defaultTasksLabel();
+    
+    // Clear existing role display
+    hideRole();
+    
+    // Reset any countdown timers
+    if (window.currentOxygenCountdown) {
+        clearInterval(window.currentOxygenCountdown);
+        window.currentOxygenCountdown = null;
+    }
 }
 
 async function stopSound(url) {
