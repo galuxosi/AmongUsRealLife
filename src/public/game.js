@@ -201,15 +201,10 @@ socket.on('progress', progress => {
 	progressBar$.style.width = `${progress * 100}%`;
 });
 
-socket.on('disconnect', () => {
-    socket.emit('player-tasks-complete');
-});
-
 // Hide role button
 function hideRole() {
 	document.querySelectorAll('.role').forEach(element => (element.style.display = 'none'));
 }
-
 
 async function wait(milliseconds) {
 	await new Promise(resolve => {
@@ -427,12 +422,6 @@ socket.on('do-dead', async () => {
 
 socket.on('do-ejected', async () => {
 	crewEndgame("Гра закінчена. Усі предателі були викинуті.")
-});
-
-enableSound$.addEventListener('click', async () => {
-	console.log('enable sound');
-	enableSound$.style.display = 'none';
-	soundPlayer.play();
 });
 
 async function playSound(url, loop = false) {

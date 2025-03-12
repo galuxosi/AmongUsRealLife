@@ -80,24 +80,12 @@ io.on('connection', socket => {
 	
 	// When a player disconnects
 	socket.on('disconnect', () => {
-		const playerId = socket.id;
 		const disconnectedPlayer = players.find(player => player.id === socket.id);
 		if (disconnectedPlayer) {
 			console.log(`Player ${disconnectedPlayer.name} disconnected`);
 			players = players.filter(player => player.id !== socket.id);
 			io.emit('update-players', players);
 		}
-		const player = players[socket.id]; // Get the player that disconnected
-		if (players[playerId]) {
-			tasks.forEach((taskId) => {
-				io.emit('task-complete', taskId);
-			});
-	
-			// Надсилаємо всім оновлення
-			io.emit('complete-tasks-for-player', playerId);
-		}
-		delete players[playerId]; // Видалити гравця зі списку
-		io.emit('update-players', Object.values(players));
 	});
 
 	socket.on('start-game', () => {
