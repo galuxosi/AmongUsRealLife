@@ -123,51 +123,56 @@ io.on('connection', socket => {
 		io.emit('play-start');
 
 		// Generate random number from 10000 to 99999
-		const min = 10000;
-        const max = 99999;	
-        let randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-
-		// Select location for divert power task
-		const divertPowerOptions = ["Адмін", "Медпункт", "Комунікації", "O2", "Реактор"];
-		let randomDivertPowerOption = divertPowerOptions[Math.floor(Math.random() * divertPowerOptions.length)];
-		console.log(randomDivertPowerOption)
-
-		// Select location for download data task
-		const downloadDataOptions = ["Адмін", "Електрична", "О2", "Медпункт", "Реактор"];
-		let randomDownloadDataOption = downloadDataOptions[Math.floor(Math.random() * downloadDataOptions.length)];
-		console.log(randomDownloadDataOption)
-
-		// Select random remote button
-		const buttonRemote = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "10+", "увімк/вимк"];
-		let randomButtonRemote = buttonRemote[Math.floor(Math.random() * buttonRemote.length)];
-		console.log(randomButtonRemote)
-
-		// Select random another remote button 
-		const colorRemote = ["ЧЕРВОНОГО", "ЗЕЛЕНОГО", "СИНЬОГО", "ЖОВТОГО", "РОЖЕВОГО", "ОРАНЖЕВОГО"];
-		let randomColorRemote = colorRemote[Math.floor(Math.random() * colorRemote.length)];
-		console.log(randomColorRemote)
-
-		const TASKS = [
+		function generateRandomTask(taskType) {
+			// Random values for different task types
+			const min = 10000;
+			const max = 99999;
+			const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+			
+			const locations = ["Адмін", "Медпункт", "Електрична", "Комунікації", "О2", "Реактор"];
+			const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+			
+			const buttonRemote = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "10+", "увімк/вимк"];
+			const randomButtonRemote = buttonRemote[Math.floor(Math.random() * buttonRemote.length)];
+			
+			const colorRemote = ["ЧЕРВОНОГО", "ЗЕЛЕНОГО", "СИНЬОГО", "ЖОВТОГО", "РОЖЕВОГО", "ОРАНЖЕВОГО"];
+			const randomColorRemote = colorRemote[Math.floor(Math.random() * colorRemote.length)];
+			
+			// Generate tasks based on task type
+			switch(taskType) {
+				case 'id-code':
+					return `Адмін: Введіть ID-код: ${randomNumber}`;
+				case 'button':
+					return `Електрична: Натисніть на пульті кнопку "${randomButtonRemote}"`;
+				case 'color':
+					return `Електрична: Натисніть на RGB пульті кнопку ${randomColorRemote} кольору`;
+				case 'power':
+					return `Електрична: Подайте енергію: ${randomLocation} (2 етапа)`;
+				case 'download':
+					return `${randomLocation}: Завантажте і відправте дані (починається з коммунікацій)`;
+				default:
+					return taskType;
+			}
+		}
+	
+		// Define task types (instead of full task descriptions)
+		const TASK_TYPES = [
 			'Адмін: Проведіть карту',
-			'Адмін: Введіть ID-код: ' + randomNumber,
+			'id-code', // Will be randomized
 			'Адмін: Відскануйте талон',
-			'Електрична: Натисніть на пульті кнопку ' + '"' + randomButtonRemote + '"',
-			'Електрична: Натисніть на RGB пульті кнопку ' + randomColorRemote + ' кольору',
-			'Електрична: Перемкніть рубильник ',
-			'Електрична: Подайте енергію: `' + randomDivertPowerOption + "` (2 етапа)",
-			'Електрична: Замініть батарейки',
+			'button', // Will be randomized
+			'color', // Will be randomized
+			'Електрична: Перемкніть рубильник',
+			'power', // Will be randomized
 			'Медпункт: Пройдіть скан',
 			'Медпункт: Подрімайте',
 			'Комунікації: Впімайте сигнал',
 			'Комунікації: Перезавантажте WiFi',
-			randomDownloadDataOption + ': Завантажте і відправте дані (починається з коммунікацій)',
+			'download', // Will be randomized
 			'Турніки: Повесіть на турніку 8 с',
 			'Турніки: Присядьте 5 разів',
 			'Турніки: Виконайте "Джампінг Джек" 5 разів',
 			'Турніки: З`їздьте з гірки',
-			'Лаунж: Отримайте дубль на кубиках',
-			'Лаунж: Розсортуйте кубіки за кольорами',
-			'Лаунж: Зберіть одну сторону кубика Рубіка'
 		];
 
 		// Get player sockets
@@ -204,56 +209,31 @@ io.on('connection', socket => {
 		}
 
 		// Pool of tasks so they are distributed evenly
-		let shuffledTasks = [];
-
-		// Dictionary with key as socket.id and value is array of tasks
-		playerTasks = {};
+		let shuffledTaskTypes = [];
     
-		// Keep track of assigned tasks per player to avoid duplicates
-		const playerAssignedTasks = {};
-		
-		// Assign tasks
+    	// Assign tasks
 		taskProgress = {};
-		for (let i = 0; i < N_TASKS; i++) {
-			for (const player of playerSockets) {
-				// Initialize player's task tracking objects if they don't exist
-				if (!playerTasks[player.id]) {
-					playerTasks[player.id] = {};
-					playerAssignedTasks[player.id] = new Set(); // Use a Set to track assigned task descriptions
+		playerTasks = {};
+		let playerAssignedTasks = {};
+
+		for (const player of playerSockets) {
+			playerTasks[player.id] = {}; 
+			playerAssignedTasks[player.id] = new Set(); 
+
+			let availableTasks = _.shuffle(TASK_TYPES).slice(0, N_TASKS); 
+
+			for (const taskType of availableTasks) {
+				let taskDescription = generateRandomTask(taskType);
+
+				while (playerAssignedTasks[player.id].has(taskDescription)) {
+					taskDescription = generateRandomTask(taskType);
 				}
-				
-				// Select a random task that hasn't been assigned to this player yet
-				let taskDescription;
-				let attempts = 0;
-				const maxAttempts = 50; // Prevent infinite loop
-				
-				do {
-					// Make sure there's a pool of shuffled tasks
-					if (shuffledTasks.length === 0) {
-						shuffledTasks = _.shuffle(TASKS);
-					}
-					
-					taskDescription = shuffledTasks.pop();
-					attempts++;
-					
-					// If we've tried too many times, just use the task (prevent infinite loop)
-					if (attempts >= maxAttempts) {
-						break;
-					}
-					
-					// If this task is already assigned to this player, put it back and try again
-					if (playerAssignedTasks[player.id].has(taskDescription)) {
-						shuffledTasks.unshift(taskDescription); // Put it back in the pool
-					}
-					
-				} while (playerAssignedTasks[player.id].has(taskDescription));
-				
-				// Now we have a task that hasn't been assigned to this player
+
 				playerAssignedTasks[player.id].add(taskDescription);
-				
+
 				const taskId = uuid();
 				playerTasks[player.id][taskId] = taskDescription;
-				
+
 				if (!impostors.includes(player.id)) {
 					taskProgress[taskId] = false;
 				}
