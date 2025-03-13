@@ -46,18 +46,18 @@ const SOUNDS = {
 	sabotage: '/sounds/sabotage.mp3',
 	start: '/sounds/start.mp3',
 	sussyBoy: '/sounds/sussy-boy.mp3',
-	voteResult: '/sounds/vote-result.mp3',
+	voteResult: '/sounds/vote-result.ogg',
 	youLose: '/sounds/you-lose.mp3',
-	youWin: '/sounds/you-win.mp3',
+	youWin: '/sounds/you-win.ogg',
 	comms: '/sounds/comms.ogg',
-	reactor: '/sounds/reactor_meltdown.mp3',
+	powerdown: '/sounds/powerdown.mp3',
+	siren: '/sounds/siren.mp3',
 	join: '/sounds/join.mp3',
 	leave: '/sounds/leave.mp3',
 	complete: '/sounds/complete.mp3',
 	incomplete: '/sounds/incomplete.ogg',
 	button: '/sounds/button.ogg',
 	accept: '/sounds/idaccepted.ogg',
-	powerdown: '/sounds/powerdown.mp3',
 	callout: '/sounds/callout.ogg'
 };
 
@@ -110,10 +110,27 @@ reactor$.addEventListener('click', () => {
 	socket.emit('reactor')
 });
 
-// When callout called (from admin.html)
-socket.on('do-callout', async () => {
-	await playSound(SOUNDS.callout)
+deadButton$.addEventListener('click', () => {
+    if (!isDead) {
+        isDead = true;
+        deadButton$.disabled = true;
+        deadButton$.style.backgroundColor = "#A9A9A9";
+        
+        if (playerRole === 'Предатель') {
+            socket.emit('player-ejected');
+            disableReportButton();
+            disableMeetingButton();
+            // Note: Impostors can still use sabotage buttons
+        } else {
+            socket.emit('player-dead');
+            disableReportButton();
+            disableMeetingButton();
+            disableSabotageButtons();
+        }
+    }
 });
+
+
 
 // Update player lobby
 socket.on('update-players', (players) => {
@@ -217,112 +234,6 @@ socket.on('progress', progress => {
 });
 
 // Hide role button
-function hideRole() {
-    document.querySelectorAll('.role').forEach(element => {
-        element.style.display = 'none';
-    });
-}
-
-async function wait(milliseconds) {
-	await new Promise(resolve => {
-		setTimeout(() => resolve(), milliseconds);
-	});
-}
-
-function toggleMap() {
-	if (map$.style.display === "block" || map$.style.display === "") {
-		map$.style.display = "none";
-	} else {
-		map$.style.display = "block";
-	}
-}
-
-function toggleLobby() {
-    if (playerLobbyDiv$.style.display === "block" || playerLobbyDiv$.style.display === "") {
-        playerLobbyDiv$.style.display = "none";
-    } else {
-        playerLobbyDiv$.style.display = "block";
-    }
-}
-
-function disableSabotageButtons() {
-    [comms$, lights$, oxygen$, reactor$].forEach(button => {
-        button.disabled = true;
-        button.style.backgroundColor = "darkred";
-    });
-
-}
-function enableSabotageButtons() {
-    setTimeout(() => {
-        [comms$, lights$, oxygen$, reactor$].forEach(button => {
-            button.disabled = false;
-            button.style.backgroundColor = "#e72f2f";
-        });
-    }, 30000);
-}
-
-function enableSabotageButtonsForce() {
-	[comms$, lights$, oxygen$, reactor$].forEach(button => {
-		button.disabled = false;
-		button.style.backgroundColor = "#e72f2f";
-	});
-}
-
-function disableMeetingButton() {
-	emergencyMeeting$.disabled = true;
-    emergencyMeeting$.style.backgroundColor = "#A9A9A9";
-}
-
-function enableMeetingButton() {
-	emergencyMeeting$.disabled = false;
-	emergencyMeeting$.style.backgroundColor = "#F0F0F0";
-}
-
-function disableReportButton() {
-	report$.disabled = true;
-    report$.style.backgroundColor = "#A9A9A9";
-}
-
-function enableReportButton() {
-	report$.disabled = false;
-	report$.style.backgroundColor = "#F0F0F0";
-}
-
-function editTasksLabel(sabotageType) {
-	tasksLabel$.innerHTML = sabotageType;
-	tasksLabel$.style.color = "#ff0000";
-}
-
-function defaultTasksLabel() {
-	tasksLabel$.innerHTML = "Завдання";
-	tasksLabel$.style.color = "#000000";
-}
-
-function sabotageEndgame(sabotageEndgameType) {
-	timeLeft = 30;
-	playSound(SOUNDS.youLose);
-	enableSabotageButtonsForce();
-	enableMeetingButton();
-	defaultTasksLabel();
-	if (window.currentOxygenCountdown) {
-		clearInterval(window.currentOxygenCountdown);
-		window.currentOxygenCountdown = null;
-	}
-	editTasksLabel(sabotageEndgameType)
-}
-
-function crewEndgame(crewEndgameType) {
-	timeLeft = 30;
-	playSound(SOUNDS.youWin);
-	enableSabotageButtonsForce();
-	enableMeetingButton();
-	defaultTasksLabel();
-	if (window.currentOxygenCountdown) {
-		clearInterval(window.currentOxygenCountdown);
-		window.currentOxygenCountdown = null;
-	}
-	editTasksLabel(crewEndgameType)
-}
 
 socket.on('play-start', async () => {
     resetGame(); // Add this line to reset everything
@@ -364,13 +275,16 @@ socket.on('do-comms', async () => {
 });
 
 socket.on('do-comms-fixed', async () => {
-	stopSound();
-    enableSabotageButtons();
-	enableMeetingButton();
-	defaultTasksLabel();
-	progressGreen$.style.display = 'block'
-	tasks$.style.display = 'block'
-	progressLabel$.style.display = 'block'
+    stopSound();
+    // Instead of enabling buttons directly, check player state first
+    if (!isDead) {
+        enableSabotageButtons();
+        enableMeetingButton();
+    }
+    defaultTasksLabel();
+    progressGreen$.style.display = 'block';
+    tasks$.style.display = 'block';
+    progressLabel$.style.display = 'block';
 });
 
 socket.on('do-lights', async () => {
@@ -382,16 +296,15 @@ socket.on('do-lights', async () => {
 });
 
 socket.on('do-lights-fixed', async () => {
-	stopSound();
-	enableSabotageButtons();
-	enableMeetingButton()
-	enableReportButton();
-	defaultTasksLabel();
+    stopSound();
+    // Check player state before enabling buttons
+    checkButtonState();
+    defaultTasksLabel();
 });
 
 socket.on('do-oxygen', async () => {
 	timeLeft = 30; 
-	playSound(SOUNDS.reactor);
+	playSound(SOUNDS.siren);
 	disableSabotageButtons();
 	disableMeetingButton();
 	editTasksLabel("Витік кисню через " + timeLeft)
@@ -407,7 +320,7 @@ socket.on('do-oxygen', async () => {
 
 socket.on('do-reactor', async () => {
 	timeLeft = 30; 
-	playSound(SOUNDS.reactor);
+	playSound(SOUNDS.siren);
 	disableSabotageButtons();
 	disableMeetingButton();
 	editTasksLabel("Вибух реактора через " + timeLeft)
@@ -422,37 +335,19 @@ socket.on('do-reactor', async () => {
 });
 
 socket.on('do-criticalSabotage-fixed', async () => {
-	stopSound();
-	clearTimeout(timeOutSabotage);
-	enableSabotageButtons();
-	enableMeetingButton();
-	if (window.currentOxygenCountdown) {
-		clearInterval(window.currentOxygenCountdown);
-		window.currentOxygenCountdown = null;
-	}
-	timeLeft = 30; 
-	defaultTasksLabel();
+    stopSound();
+    clearTimeout(timeOutSabotage);
+    // Check player state before enabling buttons
+    checkButtonState();
+    if (window.currentOxygenCountdown) {
+        clearInterval(window.currentOxygenCountdown);
+        window.currentOxygenCountdown = null;
+    }
+    timeLeft = 30; 
+    defaultTasksLabel();
 });
 
-deadButton$.addEventListener('click', () => {
-    if (!isDead) {
-        isDead = true;
-        deadButton$.disabled = true;
-        deadButton$.style.backgroundColor = "#A9A9A9";
-        
-        if (playerRole === 'Предатель') {
-            socket.emit('player-ejected');
-            disableReportButton();
-            disableMeetingButton();
-            // Note: Impostors can still use sabotage buttons
-        } else {
-            socket.emit('player-dead');
-            disableReportButton();
-            disableMeetingButton();
-            disableSabotageButtons();
-        }
-    }
-});
+
 
 socket.on('check-win-condition', () => {
     // Handle UI updates when win condition check happens
@@ -470,6 +365,126 @@ socket.on('impostor-ejected', () => {
     // Optional: Play a sound or show a message when an impostor is ejected
     playSound(SOUNDS.voteResult);
 });
+
+// When callout called (from admin.html)
+socket.on('do-callout', async () => {
+	await playSound(SOUNDS.callout)
+});
+
+function hideRole() {
+    document.querySelectorAll('.role').forEach(element => {
+        element.style.display = 'none';
+    });
+}
+
+async function wait(milliseconds) {
+	await new Promise(resolve => {
+		setTimeout(() => resolve(), milliseconds);
+	});
+}
+
+function toggleMap() {
+	if (map$.style.display === "block" || map$.style.display === "") {
+		map$.style.display = "none";
+	} else {
+		map$.style.display = "block";
+	}
+}
+
+function toggleLobby() {
+    if (playerLobbyDiv$.style.display === "block" || playerLobbyDiv$.style.display === "") {
+        playerLobbyDiv$.style.display = "none";
+    } else {
+        playerLobbyDiv$.style.display = "block";
+    }
+}
+
+function disableSabotageButtons() {
+    [comms$, lights$, oxygen$, reactor$].forEach(button => {
+        button.disabled = true;
+        button.style.backgroundColor = "darkred";
+    });
+
+}
+function enableSabotageButtons() {
+    if (!isDead || playerRole === 'Предатель') {
+        setTimeout(() => {
+            [comms$, lights$, oxygen$, reactor$].forEach(button => {
+                button.disabled = false;
+                button.style.backgroundColor = "#e72f2f";
+            });
+        }, 30000);
+    }
+}
+
+function enableSabotageButtonsForce() {
+    if (!isDead || playerRole === 'Предатель') {
+        [comms$, lights$, oxygen$, reactor$].forEach(button => {
+            button.disabled = false;
+            button.style.backgroundColor = "#e72f2f";
+        });
+    }
+}
+
+function disableMeetingButton() {
+	emergencyMeeting$.disabled = true;
+    emergencyMeeting$.style.backgroundColor = "#A9A9A9";
+}
+
+function enableMeetingButton() {
+    if (!isDead) {
+        emergencyMeeting$.disabled = false;
+        emergencyMeeting$.style.backgroundColor = "#F0F0F0";
+    }
+}
+
+function disableReportButton() {
+	report$.disabled = true;
+    report$.style.backgroundColor = "#A9A9A9";
+}
+
+function enableReportButton() {
+    if (!isDead) {
+        report$.disabled = false;
+        report$.style.backgroundColor = "#F0F0F0";
+    }
+}
+
+function editTasksLabel(sabotageType) {
+	tasksLabel$.innerHTML = sabotageType;
+	tasksLabel$.style.color = "#ff0000";
+}
+
+function defaultTasksLabel() {
+	tasksLabel$.innerHTML = "Завдання";
+	tasksLabel$.style.color = "#000000";
+}
+
+function sabotageEndgame(sabotageEndgameType) {
+	timeLeft = 30;
+	playSound(SOUNDS.youLose);
+	enableSabotageButtonsForce();
+	enableMeetingButton();
+	defaultTasksLabel();
+	if (window.currentOxygenCountdown) {
+		clearInterval(window.currentOxygenCountdown);
+		window.currentOxygenCountdown = null;
+	}
+	editTasksLabel(sabotageEndgameType)
+}
+
+function crewEndgame(crewEndgameType) {
+	timeLeft = 30;
+	playSound(SOUNDS.youWin);
+	enableSabotageButtonsForce();
+	enableMeetingButton();
+	defaultTasksLabel();
+	if (window.currentOxygenCountdown) {
+		clearInterval(window.currentOxygenCountdown);
+		window.currentOxygenCountdown = null;
+	}
+	editTasksLabel(crewEndgameType)
+}
 
 async function playSound(url, loop = false) {
     soundPlayer.src = url;
@@ -491,6 +506,7 @@ function resetGame() {
     
     // Reset dead button
     deadButton$.disabled = false;
+	deadButton$.style.backgroundColor = '#dc3545'
     
     // Reset task display
     defaultTasksLabel();
@@ -502,6 +518,24 @@ function resetGame() {
     if (window.currentOxygenCountdown) {
         clearInterval(window.currentOxygenCountdown);
         window.currentOxygenCountdown = null;
+    }
+}
+
+function checkButtonState() {
+    if (isDead) {
+        // Player is dead, keep buttons disabled
+        disableReportButton();
+        disableMeetingButton();
+        
+        // If player is crew, also disable sabotage buttons
+        if (playerRole !== 'Предатель') {
+            disableSabotageButtons();
+        }
+    } else {
+        // Player is alive, enable buttons
+        enableReportButton();
+        enableMeetingButton();
+        enableSabotageButtons();
     }
 }
 
