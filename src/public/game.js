@@ -6,7 +6,6 @@ const socket = io({
 
 let playerName = '';
 
-// index.js ID's
 const emergencyMeeting$ = document.querySelector('#emergency-meeting');
 const enableSound$ = document.querySelector('#enable-sound');
 const progress$ = document.querySelector('#progress');
@@ -34,10 +33,11 @@ const nameForm$ = document.querySelector('#name-form')
 const deadButton$ = document.querySelector('#dead-button');
 
 // Defining variables
+let emergencyButtonUsed = false;
 let playerRole = '';
 let isDead = false;
-let countdownInterval; // Countdown for idk
-let timeOutSabotage; // Countdown for sabotage
+let countdownInterval;
+let timeOutSabotage;
 
 // Sounds
 const soundPlayer = new Audio();
@@ -85,8 +85,9 @@ report$.addEventListener('click', () => {
 
 // When "Emergency meeting" button clicked
 emergencyMeeting$.addEventListener('click', () => {
-	socket.emit('emergency-meeting');
-	emergencyMeeting$.disabled = true;
+    socket.emit('emergency-meeting');
+    emergencyMeeting$.disabled = true;
+    emergencyButtonUsed = true;
 });
 
 // When communications sabotage clicked
@@ -110,6 +111,7 @@ reactor$.addEventListener('click', () => {
 	socket.emit('reactor')
 });
 
+// When dead-button clicked
 deadButton$.addEventListener('click', () => {
     if (!isDead) {
         isDead = true;
@@ -129,8 +131,6 @@ deadButton$.addEventListener('click', () => {
         }
     }
 });
-
-
 
 // Update player lobby
 socket.on('update-players', (players) => {
@@ -347,8 +347,6 @@ socket.on('do-criticalSabotage-fixed', async () => {
     defaultTasksLabel();
 });
 
-
-
 socket.on('check-win-condition', () => {
     // Handle UI updates when win condition check happens
 });
@@ -432,7 +430,7 @@ function disableMeetingButton() {
 }
 
 function enableMeetingButton() {
-    if (!isDead) {
+    if (!isDead && !emergencyButtonUsed) {
         emergencyMeeting$.disabled = false;
         emergencyMeeting$.style.backgroundColor = "#F0F0F0";
     }
@@ -495,6 +493,7 @@ async function playSound(url, loop = false) {
 function resetGame() {
     // Reset player state
     isDead = false;
+	emergencyButtonUsed = false;
 
 	while (roleDiv$.firstChild) {
         roleDiv$.removeChild(roleDiv$.firstChild);
