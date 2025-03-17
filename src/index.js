@@ -11,9 +11,14 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-
-const N_TASKS = 5;
 const N_IMPOSTORS = 1;
+const DEFAULT_SHORT_TASKS = 2;
+const DEFAULT_LONG_TASKS = 1;
+const DEFAULT_COMMON_TASKS = 2;
+
+let shortTasksCount = DEFAULT_SHORT_TASKS;
+let longTasksCount = DEFAULT_LONG_TASKS;
+let commonTasksCount = DEFAULT_COMMON_TASKS;
 
 let playerTasks = {};
 let livingCrewMembers = [];
@@ -84,7 +89,6 @@ io.on('connection', socket => {
 	
 	// When player is disconnected (closed tab, lost connection etc.)
 	socket.on('disconnect', () => {
-		io.emit('play-disconnect')
 		const disconnectedPlayer = players.find(player => player.id === socket.id);
 		if (disconnectedPlayer) {
 			console.log(`Player ${disconnectedPlayer.name} disconnected`);
@@ -149,31 +153,37 @@ io.on('connection', socket => {
 				case 'power':
 					return `Електрична: Подайте енергію: ${randomLocation} (2 етапа)`;
 				case 'download':
-					return `${randomLocation}: Завантажте і відправте дані (починається з коммунікацій)`;
+					return `${randomLocation}: Завантажте і відправте дані в комунікаціях`;
 				default:
 					return taskType;
 			}
 		}
 	
 		// Define task types (instead of full task descriptions)
-		const TASK_TYPES = [
-			'Адмін: Проведіть карту',
-			'id-code', // Will be randomized
-			'Адмін: Відскануйте талон',
-			'button', // Will be randomized
-			'color', // Will be randomized
-			'Електрична: Перемкніть рубильник',
-			'power', // Will be randomized
-			'Медпункт: Пройдіть скан',
-			'Медпункт: Подрімайте',
-			'Комунікації: Впімайте сигнал',
-			'Комунікації: Перезавантажте WiFi',
-			'download', // Will be randomized
-			'Турніки: Повесіть на турніку 8 с',
-			'Турніки: Присядьте 5 разів',
-			'Турніки: Виконайте "Джампінг Джек" 5 разів',
-			'Турніки: З`їздьте з гірки',
-		];
+		const TASK_TYPES = {
+			COMMON: [
+				'Адмін: Проведіть карту', // Звичайне
+				'id-code', // Звичайне
+				'Адмін: Відскануйте талон', // Звичайне
+				'Медпункт: Пройдіть скан', // Звичайне
+			],
+			SHORT: [
+				'button', // Коротке
+				'color', // Коротке
+				'Електрична: Перемкніть рубильник', // Коротке
+				'Комунікації: Впімайте сигнал', // Коротке
+				'Комунікації: Перезавантажте WiFi', // Коротке
+				'Турніки: Повесіть на турніку 8 с', // Коротке
+				'Турніки: Присядьте 5 разів', // Коротке
+				'Турніки: Виконайте "Джампінг Джек" 5 разів', // Коротке
+				'Турніки: З`їздьте з гірки', // Коротке
+			],
+			LONG: [
+				'power', // Довге
+				'Медпункт: Подрімайте', // Довге
+				'download', // Довге
+			],
+		};
 
 		// Get player sockets
 		const playerSockets = [];
@@ -215,25 +225,29 @@ io.on('connection', socket => {
 		taskProgress = {};
 		playerTasks = {};
 		let playerAssignedTasks = {};
-
+		
 		for (const player of playerSockets) {
 			playerTasks[player.id] = {}; 
 			playerAssignedTasks[player.id] = new Set(); 
-
-			let availableTasks = _.shuffle(TASK_TYPES).slice(0, N_TASKS); 
-
-			for (const taskType of availableTasks) {
+		
+			let commonTasks = _.shuffle(TASK_TYPES.COMMON).slice(0, commonTasksCount);
+			let shortTasks = _.shuffle(TASK_TYPES.SHORT).slice(0, shortTasksCount);
+			let longTasks = _.shuffle(TASK_TYPES.LONG).slice(0, longTasksCount);
+			
+			let selectedTasks = [...commonTasks, ...shortTasks, ...longTasks,];
+			
+			for (const taskType of selectedTasks) {
 				let taskDescription = generateRandomTask(taskType);
-
+		
 				while (playerAssignedTasks[player.id].has(taskDescription)) {
 					taskDescription = generateRandomTask(taskType);
 				}
-
+		
 				playerAssignedTasks[player.id].add(taskDescription);
-
+		
 				const taskId = uuid();
 				playerTasks[player.id][taskId] = taskDescription;
-
+		
 				if (!impostors.includes(player.id)) {
 					taskProgress[taskId] = false;
 				}

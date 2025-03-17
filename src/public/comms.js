@@ -54,7 +54,6 @@ function pressNumber(number) {
         if (currentNumber > 10) {
             // Task completed
             setTimeout(function() {
-                alert('Саботаж був поремонтований. Сайт буде закритий.');
                 window.location = "about:blank"
             }, 500);
             playCompleteSound();
