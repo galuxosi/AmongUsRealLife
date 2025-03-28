@@ -1,15 +1,16 @@
-# Among Us in real life
+# Among Us in Real Life
 
 ## Overview
-This is a fork of michaelgira23 repository. I forked it and upgraded it.
+This is a fork of Michaelgira23's repository. I forked it and added some features.
 
-## Features
-- Assign roles as Impostors or Crewmates.
-- Randomly distribute tasks to players.
-- Checking task as done will fill the global task progress.
-- 4 sabotages available.
-- CCTV Camera that connected to the game.
-- Simple and intuitive interface for managing the game.
+## New features
+- No more duplicating tasks.
+- Tasks were divided into 3 categories: long, short, and common.
+- "I am killed/ejected" button was added.
+- Lobby of players was added
+- The game ends when all impostors have been ejected, or when the number of crewmates is the same as the number of impostors.
+- 4 sabotages available. Each of them has its own page.
+- Droidcam available.
 
 ## Installation
 To set up the project locally, follow these steps:
@@ -26,38 +27,30 @@ To set up the project locally, follow these steps:
 3. **Install Dependencies**:
    ```bash
    npm install
-   npm ci
-   npm install --include=dev
    ```
-
-4. **Sabotages setup (Optional)**
-   - Identify the devices or systems you want to use for sabotage tasks (e.g., laptops, tablets, or smartphones).
-   - Deploy sabotage-specific web pages or applications to these devices. These can simulate sabotages like reactor meltdown or oxygen depletion.
-   - Specific requirements for sabotages:
-     - **Reactor Sabotage**: Requires **2 devices**. Players must interact with both devices simultaneously to fix the sabotage. Visit [http://localhost:5001/reactor](http://localhost:5001/reactor) on both devices.
-     - **Oxygen Sabotage**: Requires **1 device** for players to input the oxygen code. Visit [http://localhost:5001/oxygen](http://localhost:5001/oxygen) on the device.
-     - **Other Sabotages**: Do not require additional devices.
-   - If you do not want to use any sabotages, you just can delete them from the code, or just ignore the buttons.
-
-5. **[BETA] Camera setup (Optional)**
-   - Take a device that would be used as CCTV. It must have an installed DroidCam on it.
-   - Change the DroidCam's IP in [`src="..."`](https://github.com/galuxosi/AmongUsRealLife/blob/main/src/views/camera.html)
-   - Take an another device and visit a [http://localhost:5001/camera](http://localhost:5001/camera). This device will be used for watching the camera.
-   - Make sure the camera is working and you can see an image from it on another device.
-   - Install the camera on place it must filming.
-
-7. **Start the Backend**:
+4. **Start the Backend**:
    ```bash
    npm start
    ```
 
-8. **Access the Admin Panel**:
+5. **Access the Admin Panel**:
    Open [http://localhost:5001/admin](http://localhost:5001/admin) in your browser to manage the game.
 
-9. **Connect Players**:
+6. **Connect Players**:
    Players can join via [http://localhost:5001](http://localhost:5001) or by connecting to the local IP address of the host.
 
+7. **Sabotages setup (Optional)**
+   - Every sabotage has its URL to fix: /comms, /lights, /oxygen, /reactor.
+   - Print 4 QR-Codes, each of which sends to sabotage pages
+   - Now, when an impostor starts sabotage, players may fix it by scanning the URL and completing the minigame.
+   - If you do not want to use any sabotages, you can delete them from the code, or tell players to ignore the buttons.
 
+8. **[BETA] Camera setup (Optional)**
+   - Take a device that would be used as CCTV. It must have an installed DroidCam on it.
+   - Change the DroidCam's IP in [`src="..."`](https://github.com/galuxosi/AmongUsRealLife/blob/main/src/views/camera.html)
+   - Take another device and visit a [http://localhost:5001/camera](http://localhost:5001/camera). This device will be used for watching the camera.
+   - Make sure the camera is working and you can see an image from another device.
+   - Install the camera in place it must filming.
 
 ## Folder Structure
 
@@ -74,7 +67,10 @@ project_root
 The game can be customized by modifying the following properties in `src/index.js`:
 
 - **`TASKS`**: An array of task descriptions assigned to players.
-- **`N_TASKS`**: Number of tasks assigned to each player.
+- **`DEFAULT_COMMON_TASKS`**: Number of common tasks assigned to each player.
+- **`DEFAULT_LONG_TASKS`**: Number of long tasks assigned to each player.
+- **`DEFAULT_SHORT_TASKS`**: Number of short tasks assigned to each player.
+- **`TASK_TYPES`**: Array of all tasks that may be assigned to the players.
 - **`N_IMPOSTORS`**: Number of Impostors in the game.
 
 Example:
