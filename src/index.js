@@ -156,7 +156,7 @@ io.on('connection', socket => {
 				case 'power':
 					return `Електрична: Подайте енергію: ${randomLocation} (2 етапа)`;
 				case 'download':
-					return `${DownloadRandomLocation}: Завантажте і відправте дані в комунікаціях`;
+					return `${DownLoadRandomLocation}: Завантажте і відправте дані в комунікаціях`;
 				default:
 					return taskType;
 			}
