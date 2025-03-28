@@ -135,6 +135,9 @@ io.on('connection', socket => {
 			
 			const locations = ["Адмін", "Медпункт", "Електрична", "Комунікації", "О2", "Реактор"];
 			const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+
+			const DownLoadLocations = ["Адмін", "Медпункт", "Електрична", "О2", "Реактор"];
+			const DownLoadRandomLocation = DownLoadLocations[Math.floor(Math.random() * DownLoadLocations.length)];
 			
 			const buttonRemote = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "10+", "увімк/вимк"];
 			const randomButtonRemote = buttonRemote[Math.floor(Math.random() * buttonRemote.length)];
@@ -153,7 +156,7 @@ io.on('connection', socket => {
 				case 'power':
 					return `Електрична: Подайте енергію: ${randomLocation} (2 етапа)`;
 				case 'download':
-					return `${randomLocation}: Завантажте і відправте дані в комунікаціях`;
+					return `${DownloadRandomLocation}: Завантажте і відправте дані в комунікаціях`;
 				default:
 					return taskType;
 			}
